@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>softeeth — Dental Clinic Management, Simplified</title>
+<meta name="description" content="Patient records, appointments, dental charting, billing, finance, and inventory — a single web app for the whole dental practice." />
+<style>
+  /* ============================================================
+     softeeth — self-contained landing page
+     All styling is embedded here; all imagery is inline SVG, so
+     the file renders identically with no server, build, or network.
+     ============================================================ */
+
+  :root{
+    /* Brand (violet) + accent — the runtime theme's effective palette */
+    --brand-50:#f5f3ff; --brand-100:#ede9fe; --brand-200:#ddd6fe;
+    --brand-400:#a78bfa; --brand-500:#8b5cf6; --brand-600:#7c3aed;
+    --brand-700:#6d28d9; --brand-800:#5b21b6;
+    --accent-100:#f3e8ff; --accent-200:#e9d5ff; --accent-400:#c084fc;
+    --accent-500:#a855f7; --accent-600:#9333ea; --accent-700:#7e22ce;
+    /* Slate neutrals */
+    --s-900:#0f172a; --s-800:#1e293b; --s-700:#334155; --s-600:#475569;
+    --s-500:#64748b; --s-400:#94a3b8; --s-300:#cbd5e1; --s-200:#e2e8f0;
+    --s-100:#f1f5f9; --s-50:#f8fafc;
+    /* Deal accents */
+    --em-100:#d1fae5; --em-200:#a7f3d0; --em-500:#10b981; --em-700:#047857;
+    --rose-600:#e11d48;
+    --shadow-sm:0 1px 2px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.08);
+    --shadow-lg:0 10px 25px -5px rgba(15,23,42,.12),0 8px 10px -6px rgba(15,23,42,.08);
+    --shadow-2xl:0 25px 50px -12px rgba(79,32,161,.25);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,
+           "Apple Color Emoji","Segoe UI Emoji",sans-serif;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font); color:var(--s-700); background:#fff;
+    line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  a{color:inherit; text-decoration:none}
+  img,svg{display:block; max-width:100%}
+  h1,h2,h3{color:var(--s-900); letter-spacing:-.02em; line-height:1.1}
+
+  .wrap{max-width:1152px; margin:0 auto; padding:0 1rem}
+  @media(min-width:640px){ .wrap{padding:0 1.5rem} }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+    font-weight:600; border-radius:.75rem; padding:.6rem 1.1rem; cursor:pointer;
+    border:0; transition:all .18s ease; font-size:.95rem; white-space:nowrap;
+  }
+  .btn-primary{background:var(--brand-600); color:#fff; box-shadow:var(--shadow-sm)}
+  .btn-primary:hover{background:var(--brand-700); transform:translateY(-1px)}
+  .btn-ghost{background:var(--brand-50); color:var(--brand-700)}
+  .btn-ghost:hover{background:var(--brand-100)}
+  .btn-white{background:#fff; color:var(--brand-700)}
+  .btn-white:hover{background:var(--brand-50)}
+  .btn-outline-white{background:rgba(255,255,255,.1); color:#fff; box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+  .btn-outline-white:hover{background:rgba(255,255,255,.2)}
+  .btn-lg{padding:.8rem 1.5rem; font-size:1rem}
+  .btn-block{width:100%}
+
+  /* ---------- badges ---------- */
+  .badge{
+    display:inline-block; font-size:.75rem; font-weight:700; padding:.3rem .75rem;
+    border-radius:999px; letter-spacing:.01em;
+  }
+  .badge-brand{background:var(--brand-100); color:var(--brand-700); box-shadow:inset 0 0 0 1px var(--brand-200)}
+  .badge-accent{background:var(--accent-100); color:var(--accent-700); box-shadow:inset 0 0 0 1px var(--accent-200)}
+
+  .grad-text{
+    background:linear-gradient(90deg,var(--brand-600),var(--accent-500));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  /* ---------- nav ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:40; border-bottom:1px solid var(--s-100);
+    background:rgba(255,255,255,.82); backdrop-filter:blur(8px);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; padding:.7rem 0}
+  .nav-links{display:none; gap:2rem; font-size:.9rem; font-weight:500; color:var(--s-600)}
+  .nav-links a:hover{color:var(--brand-600)}
+  @media(min-width:768px){ .nav-links{display:flex} }
+
+  /* ---------- brand lockup ---------- */
+  .brand{display:inline-flex; align-items:center; gap:.6rem}
+  .brand-chip{
+    display:inline-flex; align-items:center; justify-content:center; background:#fff;
+    border-radius:.6rem; padding:.35rem; box-shadow:var(--shadow-sm);
+  }
+  .brand-chip svg{height:2rem; width:2rem}
+  .brand-name{font-weight:700; font-size:1.125rem; color:var(--s-900); letter-spacing:-.02em; line-height:1}
+  .brand-tagline{
+    display:block; font-size:9px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--s-400); margin-top:2px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{position:relative; overflow:hidden}
+  .hero-bg{position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to bottom,var(--brand-50),#fff 55%,#fff)}
+  .blob{position:absolute; border-radius:999px; filter:blur(64px); pointer-events:none}
+  .blob-a{right:-6rem; top:-6rem; height:24rem; width:24rem; background:rgba(221,214,254,.45)}
+  .blob-b{left:-6rem; top:10rem; height:20rem; width:20rem; background:rgba(233,213,255,.45)}
+  .hero-grid{
+    position:relative; display:grid; gap:3rem; align-items:center;
+    padding:4rem 0;
+  }
+  @media(min-width:1024px){ .hero-grid{grid-template-columns:1fr 1fr; padding:6rem 0} }
+  .hero h1{font-size:2.5rem; font-weight:800; margin-top:1.25rem}
+  @media(min-width:640px){ .hero h1{font-size:3rem} }
+  .hero .lead{margin-top:1.25rem; max-width:36rem; font-size:1.125rem; color:var(--s-600); line-height:1.7}
+  .hero-cta{margin-top:2rem; display:flex; flex-wrap:wrap; gap:.75rem}
+  .hero-checks{margin-top:2rem; display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; font-size:.875rem; color:var(--s-500)}
+  .hero-checks span{display:inline-flex; align-items:center; gap:.5rem}
+  .dot{height:.5rem; width:.5rem; border-radius:999px; background:var(--em-500); display:inline-block}
+
+  /* ---------- login card ---------- */
+  .login-card{
+    max-width:28rem; margin:0 auto; width:100%; background:#fff; border-radius:1.5rem;
+    padding:2rem; box-shadow:var(--shadow-2xl); border:1px solid rgba(226,232,240,.7);
+  }
+  .login-card h2{font-size:1.5rem; font-weight:700}
+  .login-card .sub{margin-top:.25rem; font-size:.875rem; color:var(--s-500)}
+  .field{margin-top:1rem}
+  .label{display:block; font-size:.8rem; font-weight:600; color:var(--s-600); margin-bottom:.35rem}
+  .input{
+    width:100%; padding:.6rem .8rem; border:1px solid var(--s-200); border-radius:.6rem;
+    font-size:.95rem; color:var(--s-800); font-family:inherit; transition:border .15s,box-shadow .15s;
+  }
+  .input:focus{outline:none; border-color:var(--brand-500); box-shadow:0 0 0 3px var(--brand-100)}
+  .login-note{margin-top:.85rem; font-size:.75rem; color:var(--s-400); text-align:center}
+
+  /* ---------- generic section ---------- */
+  section{padding:5rem 0}
+  .sec-head{max-width:42rem; margin:0 auto; text-align:center}
+  .sec-head h2{font-size:1.875rem; font-weight:800; margin-top:1rem}
+  @media(min-width:640px){ .sec-head h2{font-size:2.25rem} }
+  .sec-head p{margin-top:1rem; font-size:1.125rem; color:var(--s-600)}
+  .bg-slate{background:var(--s-50)}
+
+  /* ---------- features ---------- */
+  .features-grid{margin-top:3.5rem; display:grid; gap:1.5rem; grid-template-columns:1fr}
+  @media(min-width:640px){ .features-grid{grid-template-columns:1fr 1fr} }
+  @media(min-width:1024px){ .features-grid{grid-template-columns:1fr 1fr 1fr} }
+  .feature-card{
+    background:#fff; border:1px solid rgba(226,232,240,.7); border-radius:1rem; padding:1.5rem;
+    box-shadow:var(--shadow-sm); transition:all .2s ease;
+  }
+  .feature-card:hover{transform:translateY(-4px); border-color:var(--brand-200); box-shadow:var(--shadow-lg)}
+  .feature-icon{
+    height:3rem; width:3rem; display:flex; align-items:center; justify-content:center;
+    border-radius:.75rem; background:var(--brand-50); color:var(--brand-600);
+    box-shadow:inset 0 0 0 1px var(--brand-100); transition:all .2s ease;
+  }
+  .feature-card:hover .feature-icon{background:var(--brand-600); color:#fff}
+  .feature-icon svg{height:1.5rem; width:1.5rem}
+  .feature-card h3{margin-top:1.25rem; font-size:1.125rem; font-weight:700}
+  .feature-card p{margin-top:.5rem; font-size:.875rem; color:var(--s-600); line-height:1.65}
+
+  /* ---------- workflow + stats ---------- */
+  .workflow-grid{display:grid; gap:3rem; align-items:center; grid-template-columns:1fr}
+  @media(min-width:1024px){ .workflow-grid{grid-template-columns:1fr 1fr} }
+  .workflow h2{font-size:1.875rem; font-weight:800; margin-top:1rem}
+  @media(min-width:640px){ .workflow h2{font-size:2.25rem} }
+  .workflow .lead{margin-top:1rem; font-size:1.125rem; color:var(--s-600)}
+  .steps{margin-top:2rem; list-style:none; display:flex; flex-direction:column; gap:1rem}
+  .step{display:flex; gap:1rem; align-items:flex-start}
+  .step-num{
+    height:2rem; width:2rem; flex:none; border-radius:999px; background:var(--brand-600);
+    color:#fff; font-weight:700; font-size:.85rem; display:flex; align-items:center; justify-content:center;
+  }
+  .step span.txt{color:var(--s-700)}
+  .stats{display:grid; grid-template-columns:1fr 1fr; gap:1.25rem}
+  .stat{background:#fff; border-radius:1rem; padding:1.75rem; text-align:center; box-shadow:var(--shadow-sm); border:1px solid rgba(226,232,240,.7)}
+  .stat .val{font-size:2.25rem; font-weight:800}
+  .stat .lbl{margin-top:.5rem; font-size:.875rem; font-weight:500; color:var(--s-600)}
+
+  /* ---------- pricing ---------- */
+  .promo{
+    position:relative; overflow:hidden; max-width:48rem; margin:2.5rem auto 0; text-align:center;
+    border-radius:1rem; padding:1.5rem; color:#fff;
+    background:linear-gradient(90deg,var(--accent-600),var(--brand-600) 55%,var(--brand-700));
+    box-shadow:var(--shadow-lg);
+  }
+  .promo .glow{position:absolute; height:11rem; width:11rem; border-radius:999px; background:rgba(255,255,255,.1); filter:blur(48px)}
+  .promo .glow.g1{right:-2.5rem; top:-3rem}
+  .promo .glow.g2{left:-2.5rem; bottom:-3.5rem}
+  .promo-pill{
+    position:relative; display:inline-flex; align-items:center; gap:.5rem; border-radius:999px;
+    background:rgba(255,255,255,.15); padding:.3rem .8rem; font-size:.75rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.1em; box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);
+  }
+  .ping{position:relative; display:inline-flex; height:.5rem; width:.5rem}
+  .ping::before{content:""; position:absolute; inset:0; border-radius:999px; background:#fff; opacity:.75; animation:ping 1.4s cubic-bezier(0,0,.2,1) infinite}
+  .ping::after{content:""; position:relative; height:.5rem; width:.5rem; border-radius:999px; background:#fff}
+  @keyframes ping{75%,100%{transform:scale(2.2); opacity:0}}
+  .promo h3{position:relative; color:#fff; margin-top:.75rem; font-size:1.25rem; font-weight:800}
+  @media(min-width:640px){ .promo h3{font-size:1.5rem} }
+  .promo p{position:relative; margin:.4rem auto 0; max-width:34rem; font-size:.95rem; color:rgba(255,255,255,.92)}
+
+  .plans{margin-top:2rem; display:grid; gap:1.5rem; align-items:start; grid-template-columns:1fr}
+  @media(min-width:1024px){ .plans{grid-template-columns:1fr 1fr 1fr} }
+  .plan{
+    position:relative; display:flex; flex-direction:column; background:#fff; border-radius:1.5rem;
+    padding:2rem; border:1px solid rgba(226,232,240,.8); box-shadow:var(--shadow-sm); transition:all .2s ease;
+  }
+  .plan:not(.popular):hover{transform:translateY(-4px); box-shadow:var(--shadow-lg)}
+  .plan.popular{border:2px solid var(--brand-500); box-shadow:var(--shadow-2xl)}
+  @media(min-width:1024px){ .plan.popular{margin-top:-1rem; margin-bottom:1rem} }
+  .plan-tag{
+    position:absolute; top:-.75rem; left:50%; transform:translateX(-50%); border-radius:999px;
+    background:var(--brand-600); color:#fff; padding:.25rem .75rem; font-size:.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.06em; box-shadow:var(--shadow-sm);
+  }
+  .plan-name{font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:var(--brand-600)}
+  .plan.accent .plan-name{color:var(--accent-600)}
+  .plan-tagline{margin-top:.5rem; min-height:2.5rem; font-size:.875rem; color:var(--s-500)}
+  .price-row{display:flex; flex-wrap:wrap; align-items:baseline; gap:.15rem .5rem; margin-top:1.25rem}
+  .price-cur{font-size:1.25rem; font-weight:600; color:var(--s-400)}
+  .price-launch{font-size:3rem; font-weight:800; color:var(--s-900); letter-spacing:-.02em; line-height:1}
+  .price-reg{font-size:1rem; font-weight:600; color:var(--s-400); text-decoration:line-through; text-decoration-thickness:2px}
+  .price-per{font-size:.85rem; font-weight:500; color:var(--s-400)}
+  .price-meta{margin-top:.6rem; display:flex; flex-wrap:wrap; align-items:center; gap:.5rem}
+  .save-badge{border-radius:999px; background:var(--em-100); color:var(--em-700); padding:.15rem .6rem; font-size:.72rem; font-weight:700; box-shadow:inset 0 0 0 1px var(--em-200)}
+  .founding{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--brand-600)}
+  .plan.accent .founding{color:var(--accent-600)}
+  .plan .cta{margin-top:1.5rem}
+  .plan-features{margin-top:2rem; border-top:1px solid var(--s-100); padding-top:1.5rem; list-style:none; display:flex; flex-direction:column; gap:.75rem}
+  .plan-features li{display:flex; align-items:flex-start; gap:.75rem; font-size:.875rem; color:var(--s-700)}
+  .plan-features li.lead{display:block; padding-top:.25rem; font-weight:700; color:var(--s-900)}
+  .check{
+    margin-top:.1rem; flex:none; height:1.25rem; width:1.25rem; border-radius:999px;
+    background:var(--brand-50); color:var(--brand-600); display:flex; align-items:center; justify-content:center;
+  }
+  .plan.accent .check{background:var(--accent-100); color:var(--accent-600)}
+  .check svg{height:.85rem; width:.85rem}
+  .price-note{margin-top:2.5rem; text-align:center; font-size:.875rem; color:var(--s-500)}
+
+  /* ---------- closing CTA ---------- */
+  .cta-box{
+    position:relative; overflow:hidden; border-radius:1.5rem; text-align:center; color:#fff;
+    padding:3.5rem 2rem; box-shadow:var(--shadow-2xl); max-width:64rem; margin:0 auto;
+    background:linear-gradient(135deg,var(--brand-600),var(--brand-700) 45%,var(--s-900));
+  }
+  @media(min-width:640px){ .cta-box{padding:3.5rem 4rem} }
+  .cta-box .glow{position:absolute; height:16rem; width:16rem; border-radius:999px; filter:blur(48px)}
+  .cta-box .glow.g1{right:-4rem; top:-4rem; background:rgba(255,255,255,.1)}
+  .cta-box .glow.g2{left:-2.5rem; bottom:-5rem; background:rgba(192,132,252,.2)}
+  .cta-box h2{position:relative; color:#fff; font-size:1.875rem; font-weight:800}
+  @media(min-width:640px){ .cta-box h2{font-size:2.25rem} }
+  .cta-box p{position:relative; margin:1rem auto 0; max-width:36rem; font-size:1.125rem; color:var(--brand-100)}
+  .cta-actions{position:relative; margin-top:2rem; display:flex; flex-wrap:wrap; justify-content:center; gap:.75rem}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--s-100); background:#fff; padding:2.5rem 0}
+  .footer-inner{display:flex; flex-direction:column; align-items:center; gap:1.5rem; text-align:center}
+  @media(min-width:768px){ .footer-inner{flex-direction:row; justify-content:space-between; text-align:left} }
+  .footer-nav{display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; font-size:.875rem; color:var(--s-500)}
+  .footer-nav a:hover{color:var(--brand-600)}
+  .copy{font-size:.75rem; color:var(--s-400)}
+
+  :focus-visible{outline:2px solid var(--brand-500); outline-offset:2px; border-radius:.35rem}
+</style>
+</head>
+<body>
+
+  <!-- ================= NAV ================= -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="softeeth home">
+        <span class="brand-chip">
+          <!-- Inline tooth mark (embedded SVG — always renders) -->
+          <svg viewBox="0 0 24 24" role="img" aria-label="softeeth mark">
+            <path fill="#7c3aed" d="M12 3c-3 0-4.5 1.5-6 1.5S3 3.8 3 6c0 3 1 4 1.5 7S5 20 7 20s1-3 2.5-3 1.5 3 2.5 3 1-2 2-2 1 2 2 2 2-4 2.5-7S21 9 21 6c0-2.2-1.5-1.5-3-1.5S15 3 12 3Z"/>
+          </svg>
+        </span>
+        <span class="brand-name">softeeth</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#workflow">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#login">Book a visit</a>
+      </nav>
+      <a href="#login" class="btn btn-primary">Sign in</a>
+    </div>
+  </header>
+
+  <span id="top"></span>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" style="padding:0">
+    <div class="hero-bg"></div>
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="badge badge-brand">Dental clinic management, simplified</span>
+        <h1>Run your dental clinic <span class="grad-text">all in one place</span></h1>
+        <p class="lead">
+          Patient records, appointments, dental charting, billing, finance, and
+          inventory — a single, flexible web app for the whole practice. No
+          installs, accessible anywhere.
+        </p>
+        <div class="hero-cta">
+          <a href="#login" class="btn btn-primary btn-lg">Sign in to your clinic</a>
+          <a href="#login" class="btn btn-ghost btn-lg">Book a visit →</a>
+        </div>
+        <div class="hero-checks">
+          <span><span class="dot"></span> Web-based, nothing to install</span>
+          <span><span class="dot"></span> Role-based access control</span>
+        </div>
+      </div>
+
+      <!-- Login card -->
+      <div id="login" style="scroll-margin-top:6rem">
+        <div class="login-card">
+          <h2>Welcome back</h2>
+          <p class="sub">Sign in to your clinic dashboard.</p>
+          <form onsubmit="return false">
+            <div class="field">
+              <label class="label" for="u">Username</label>
+              <input class="input" id="u" name="username" placeholder="e.g. admin" autocomplete="username" />
+            </div>
+            <div class="field">
+              <label class="label" for="p">Password</label>
+              <input class="input" id="p" name="password" type="password" placeholder="Your password" autocomplete="current-password" />
+            </div>
+            <button class="btn btn-primary btn-block" style="margin-top:1.25rem; padding:.65rem">Sign in</button>
+          </form>
+          <p class="login-note">Static preview — connect this page to your clinic app to sign in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features" style="scroll-margin-top:5rem">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="badge badge-accent">Everything the front desk and the chair need</span>
+        <h2>One system for the whole practice</h2>
+        <p>Nine connected modules that share one patient record — so the work you do in one place shows up everywhere it matters.</p>
+      </div>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5a3 3 0 1 0-6 0"/><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M9 5H8a1 1 0 0 0-1 1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1a1 1 0 0 0-1-1h-1"/><path d="M8 12h8M8 16h5"/></svg></div>
+          <h3>Patient Records</h3>
+          <p>A complete chart per patient — demographics, medical history questionnaire, photos, and a full clinical timeline in one place.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="m9 15 2 2 4-4"/></svg></div>
+          <h3>Appointments &amp; Booking</h3>
+          <p>A month calendar, patient self-booking with daily slot limits per visit reason, and a request queue you approve and link to patients.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-4.5 1.5-6 1.5S3 3.8 3 6c0 3 1 4 1.5 7S5 20 7 20s1-3 2.5-3 1.5 3 2.5 3 1-2 2-2 1 2 2 2 2-4 2.5-7S21 9 21 6c0-2.2-1.5-1.5-3-1.5S15 3 12 3Z"/></svg></div>
+          <h3>Dental Charting</h3>
+          <p>An anatomical odontogram on the FDI quadrant cross — per-tooth conditions rendered as silhouettes, filled by status at a glance.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
+          <h3>Progress Notes &amp; Billing</h3>
+          <p>Rich clinical notes that double as the billing form — fees, discounts, commissions, and next-visit scheduling flow straight into finance.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16"/><circle cx="8" cy="9" r="1.5"/><circle cx="16" cy="9" r="1.5"/><circle cx="8" cy="15" r="1.5"/><circle cx="16" cy="15" r="1.5"/></svg></div>
+          <h3>Orthodontics</h3>
+          <p>Contract-based ortho with a payment passbook — deposits, per-visit installments, adjustments, and running balances tracked automatically.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 3-4 3 3 5-7"/></svg></div>
+          <h3>Finance &amp; Reports</h3>
+          <p>Income and expense ledgers with an executive query bar, PDF exports, dentist-commission statements, and charted reporting.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3"/><path d="M7 15h10"/></svg></div>
+          <h3>Lab Cases</h3>
+          <p>Track work sent to dental labs — case type, shade, due dates, job orders, and fees — so nothing gets lost between appointments.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg></div>
+          <h3>Inventory</h3>
+          <p>Keep supplies stocked with quantity tracking and reorder alerts, so the clinic never runs short mid-procedure.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>Role-based Access</h3>
+          <p>Owner, admin, dentist, and staff roles plus a granular per-user permission matrix — everyone sees exactly what they should.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORKFLOW + STATS ================= -->
+  <section id="workflow" class="bg-slate" style="scroll-margin-top:5rem">
+    <div class="wrap workflow-grid workflow">
+      <div>
+        <span class="badge badge-brand">How it works</span>
+        <h2>From booking to billing, without the busywork</h2>
+        <p class="lead">The modules talk to each other. A progress note bills itself, sets the next appointment, and updates finance — so your team charts once and the paperwork follows.</p>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span class="txt">Book online or at the desk — daily slot limits keep the schedule sane.</span></li>
+          <li class="step"><span class="step-num">2</span><span class="txt">Chart the visit and write a progress note that bills itself.</span></li>
+          <li class="step"><span class="step-num">3</span><span class="txt">Finance, commissions, and next appointment update automatically.</span></li>
+          <li class="step"><span class="step-num">4</span><span class="txt">Export ledgers and commission statements as ready-to-file PDFs.</span></li>
+        </ul>
+      </div>
+      <div class="stats">
+        <div class="stat"><p class="val grad-text">9</p><p class="lbl">Clinical modules, one login</p></div>
+        <div class="stat"><p class="val grad-text">100%</p><p class="lbl">Web-based — nothing to install</p></div>
+        <div class="stat"><p class="val grad-text">24/7</p><p class="lbl">Patient self-booking online</p></div>
+        <div class="stat"><p class="val grad-text">PDF</p><p class="lbl">Ledgers &amp; commission statements</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRICING ================= -->
+  <section id="pricing" style="scroll-margin-top:5rem">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="badge badge-brand">Simple, practice-sized pricing</span>
+        <h2>Check our affordable plans!</h2>
+        <p>Get started without breaking the bank. Clinical care is included on every plan — you only pay more as your practice and team grow.</p>
+      </div>
+
+      <!-- Founding-member launch promo -->
+      <div class="promo">
+        <div class="glow g1"></div>
+        <div class="glow g2"></div>
+        <span class="promo-pill"><span class="ping"></span> Limited-time launch offer</span>
+        <h3>Founding Member Pricing</h3>
+        <p>Lock in your discounted monthly rate for as long as your subscription remains active.</p>
+      </div>
+
+      <div class="plans">
+
+        <!-- Solo -->
+        <div class="plan">
+          <h3 class="plan-name">Solo</h3>
+          <p class="plan-tagline">For the single-chair practice or associate.</p>
+          <div class="price-row">
+            <span class="price-cur">₱</span>
+            <span class="price-launch">399</span>
+            <span class="price-reg">₱499</span>
+            <span class="price-per">/month*</span>
+          </div>
+          <div class="price-meta"><span class="save-badge">Save 20%</span><span class="founding">Founding rate</span></div>
+          <a href="#login" class="btn btn-ghost btn-block cta">Get started</a>
+          <ul class="plan-features">
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>1 Dentist · 2 Staff accounts</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>1,000 Patient Records</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>2,000 Patient Photos</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Unlimited Appointments</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Online Booking &amp; Screening Form</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Dental Charting &amp; Progress Notes</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Lab Cases &amp; Ortho Records</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Basic Income / Expense Tracking</li>
+          </ul>
+        </div>
+
+        <!-- Clinic (popular) -->
+        <div class="plan popular">
+          <span class="plan-tag">Most popular</span>
+          <h3 class="plan-name">Clinic</h3>
+          <p class="plan-tagline">For the growing 2–4 dentist group.</p>
+          <div class="price-row">
+            <span class="price-cur">₱</span>
+            <span class="price-launch">799</span>
+            <span class="price-reg">₱999</span>
+            <span class="price-per">/month*</span>
+          </div>
+          <div class="price-meta"><span class="save-badge">Save 20%</span><span class="founding">Founding rate</span></div>
+          <a href="#login" class="btn btn-primary btn-block cta">Get started</a>
+          <ul class="plan-features">
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>3 Dentists · 6 Staff accounts</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>15,000 Patient Records</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>25,000 Patient Photos</li>
+            <li class="lead">Everything in Solo, plus:</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Finance Suite &amp; PDF Ledger Export</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Dentist Commission Reports</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Inventory Management</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Granular Per-user Permissions</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Priority Support</li>
+          </ul>
+        </div>
+
+        <!-- Pro (accent) -->
+        <div class="plan accent">
+          <h3 class="plan-name">Pro</h3>
+          <p class="plan-tagline">For multi-dentist practices, scaling up.</p>
+          <div class="price-row">
+            <span class="price-cur">₱</span>
+            <span class="price-launch">1,599</span>
+            <span class="price-reg">₱1,999</span>
+            <span class="price-per">/month*</span>
+          </div>
+          <div class="price-meta"><span class="save-badge">Save 20%</span><span class="founding">Founding rate</span></div>
+          <a href="#login" class="btn btn-ghost btn-block cta">Get started</a>
+          <ul class="plan-features">
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>10 Dentists · Unlimited Staff</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Unlimited Patient Records</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>75,000 Photos + add-on packs</li>
+            <li class="lead">Everything in Clinic, plus:</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Multi-Branch Management</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Executive Analytics Dashboard</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Custom Branding &amp; White-label</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Audit Logs &amp; Activity History</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Custom Reports &amp; Dashboard</li>
+            <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>Dedicated Onboarding + Priority Support</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <p class="price-note">* Founding-member launch pricing shown, discounted from the regular monthly rate. Prices in PHP, billed monthly. Save two months on annual billing.</p>
+    </div>
+  </section>
+
+  <!-- ================= CLOSING CTA ================= -->
+  <section>
+    <div class="wrap">
+      <div class="cta-box">
+        <div class="glow g1"></div>
+        <div class="glow g2"></div>
+        <h2>Ready to manage your clinic digitally?</h2>
+        <p>Sign in with your clinic account, or let your patients book their next visit online in under a minute.</p>
+        <div class="cta-actions">
+          <a href="#login" class="btn btn-white btn-lg">Sign in</a>
+          <a href="#login" class="btn btn-outline-white btn-lg">Book a visit</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top" aria-label="softeeth home">
+        <span class="brand-chip">
+          <svg viewBox="0 0 24 24" role="img" aria-label="softeeth mark"><path fill="#7c3aed" d="M12 3c-3 0-4.5 1.5-6 1.5S3 3.8 3 6c0 3 1 4 1.5 7S5 20 7 20s1-3 2.5-3 1.5 3 2.5 3 1-2 2-2 1 2 2 2 2-4 2.5-7S21 9 21 6c0-2.2-1.5-1.5-3-1.5S15 3 12 3Z"/></svg>
+        </span>
+        <span>
+          <span class="brand-name">softeeth</span>
+          <span class="brand-tagline">Dental Records, Simplified.</span>
+        </span>
+      </a>
+      <nav class="footer-nav">
+        <a href="#features">Features</a>
+        <a href="#workflow">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#login">Book a visit</a>
+        <a href="#login">Sign in</a>
+      </nav>
+      <p class="copy">© 2026 Softeeth Clone · For demo purposes</p>
+    </div>
+  </footer>
+
+</body>
+</html>
