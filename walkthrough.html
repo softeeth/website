@@ -1,0 +1,1723 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Softeeth Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+<style>
+  /* ---------------------------------------------------------------
+     Two token sets on purpose.
+     --page-*  : the demo chrome around the app. Follows the viewer's theme.
+     --app-*   : the product itself. Softeeth ships one light theme, so the
+                 replica stays light in both — a dark repaint would show a
+                 product that does not exist.
+     ---------------------------------------------------------------*/
+  :root {
+    --page:            #e7edf3;
+    --page-ink:        #101a28;
+    --page-ink-2:      #44556b;
+    --page-muted:      #6b7d93;
+    --page-card:       #ffffff;
+    --page-line:       #cfdae6;
+    --page-chip:       #f2f6fa;
+
+    --brand-50:  #f0f9ff;
+    --brand-100: #e0f2fe;
+    --brand-200: #bae6fd;
+    --brand-400: #38bdf8;
+    --brand-500: #0ea5e9;
+    --brand-600: #0284c7;
+    --brand-700: #0369a1;
+    --accent-100:#ede9fe;
+    --accent-600:#7c3aed;
+
+    --app-canvas: #f1f5f9;
+    --app-surface:#ffffff;
+    --app-ink:    #1e293b;
+    --app-ink-2:  #334155;
+    --app-muted:  #64748b;
+    --app-faint:  #94a3b8;
+    --app-line:   #e2e8f0;
+    --app-rail:   #0f172a;
+    --app-rail-2: #1e293b;
+
+    --ok:#059669; --ok-bg:#d1fae5; --ok-ink:#065f46;
+    --warn:#d97706; --warn-bg:#fef3c7; --warn-ink:#92400e;
+    --bad:#e11d48; --bad-bg:#ffe4e6; --bad-ink:#9f1239;
+
+    --sans: "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    --display: "Bricolage Grotesque", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --r: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page:      #0a1119;
+      --page-ink:  #eaf1f8;
+      --page-ink-2:#b4c4d4;
+      --page-muted:#8497a9;
+      --page-card: #131e29;
+      --page-line: #253444;
+      --page-chip: #1a2836;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page:      #0a1119;
+    --page-ink:  #eaf1f8;
+    --page-ink-2:#b4c4d4;
+    --page-muted:#8497a9;
+    --page-card: #131e29;
+    --page-line: #253444;
+    --page-chip: #1a2836;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--page-ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; border-radius: 6px; }
+  h1,h2,h3,h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  table { border-collapse: collapse; width: 100%; }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ================= demo chrome ================= */
+  .wrap { max-width: 1480px; margin: 0 auto; padding-inline: 16px; padding-block: 14px 28px; }
+
+  .topbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px;
+    padding-block: 6px 16px;
+  }
+  .lockup { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+  .lockup img { width: 34px; height: 34px; object-fit: contain; }
+  .lockup b {
+    font-family: var(--display); font-size: 20px; font-weight: 800;
+    letter-spacing: -.02em; display: block; line-height: 1.1;
+  }
+  .lockup span {
+    display: block; font-size: 10px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--page-muted);
+  }
+  .seg {
+    display: inline-flex; background: var(--page-chip); border: 1px solid var(--page-line);
+    border-radius: 999px; padding: 3px;
+  }
+  .seg button {
+    border: 0; background: transparent; color: var(--page-ink-2);
+    padding: 7px 15px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .seg button[aria-pressed="true"] { background: var(--brand-600); color: #fff; }
+  .ctrl { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--page-muted); }
+  .ctrl select {
+    background: var(--page-card); border: 1px solid var(--page-line); color: var(--page-ink);
+    border-radius: 9px; padding: 7px 10px; font-size: 13px; font-weight: 600;
+  }
+  .tourbtn {
+    border: 0; border-radius: 999px; padding: 9px 16px; font-weight: 700; font-size: 13px;
+    background: var(--page-ink); color: var(--page);
+  }
+  .homebtn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--page-line); border-radius: 999px; padding: 8px 15px;
+    font-weight: 700; font-size: 13px; text-decoration: none;
+    background: var(--page-card); color: var(--page-ink); white-space: nowrap;
+  }
+  .homebtn:hover { background: var(--page-chip); }
+  .homebtn svg { width: 14px; height: 14px; }
+  .note {
+    display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap;
+    font-size: 12.5px; color: var(--page-muted); padding-bottom: 12px;
+  }
+  .note b { color: var(--page-ink-2); font-weight: 700; }
+
+  /* ================= the app stage ================= */
+  .stage {
+    background: var(--app-canvas);
+    border: 1px solid var(--page-line);
+    border-radius: var(--r);
+    box-shadow: 0 24px 60px -30px rgba(8,22,40,.55);
+    overflow: hidden;
+    display: flex;
+    height: clamp(620px, calc(100dvh - 190px), 900px);
+    color: var(--app-ink);
+    position: relative;
+  }
+  .rail {
+    width: 232px; flex: 0 0 232px; background: var(--app-rail); color: #cbd5e1;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .rail-brand { display: flex; align-items: center; gap: 11px; padding: 18px 18px 14px; }
+  .rail-brand .chip { background: #fff; border-radius: 10px; padding: 6px; display: inline-flex; }
+  .rail-brand img { width: 26px; height: 26px; object-fit: contain; }
+  .rail-brand b { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -.01em; display: block; }
+  .rail-brand span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #64748b; }
+  .rail nav { padding: 4px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .rail nav button {
+    display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+    border: 0; background: transparent; color: #94a3b8;
+    padding: 9px 11px; border-radius: 9px; font-size: 13px; font-weight: 600;
+  }
+  .rail nav button:hover { background: var(--app-rail-2); color: #fff; }
+  .rail nav button[aria-current="page"] { background: var(--brand-600); color: #fff; }
+  .rail nav .ico { font-size: 14px; width: 18px; text-align: center; }
+  .rail nav .cnt {
+    margin-left: auto; background: #fbbf24; color: #451a03; font-size: 10.5px; font-weight: 800;
+    border-radius: 999px; padding: 1px 7px;
+  }
+  .rail-foot { margin-top: auto; border-top: 1px solid var(--app-rail-2); padding: 14px 18px; }
+  .rail-foot .k { font-size: 11px; color: #64748b; }
+  .rail-foot .n { font-size: 13px; font-weight: 700; color: #fff; }
+  .rail-foot .r { font-size: 11px; color: var(--brand-400); text-transform: capitalize; }
+
+  .panel { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--app-canvas); }
+  .apphead {
+    display: flex; align-items: center; gap: 12px; background: #fff;
+    border-bottom: 1px solid var(--app-line); padding: 10px 18px; flex: 0 0 auto;
+  }
+  .apphead .who { margin-left: auto; display: flex; align-items: center; gap: 9px; }
+  .apphead .sys { font-size: 12.5px; color: var(--app-faint); }
+  .burger { display: none; border: 0; background: transparent; font-size: 17px; color: var(--app-muted); padding: 4px 8px; border-radius: 8px; }
+  .scroll { overflow-y: auto; padding: 20px; flex: 1; }
+  @media (max-width: 860px) {
+    .rail {
+      position: absolute; inset: 0 auto 0 0; z-index: 30; transform: translateX(-100%);
+      transition: transform .18s ease;
+    }
+    .stage.nav-open .rail { transform: none; }
+    .burger { display: block; }
+    .scroll { padding: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  /* ================= app vocabulary (mirrors index.css) ================= */
+  .card { background: var(--app-surface); border-radius: 16px; padding: 18px; box-shadow: 0 1px 2px rgba(15,23,42,.05); border: 1px solid rgba(226,232,240,.8); }
+  .card.tight { padding: 0; overflow: hidden; }
+  .h1 { font-size: 21px; font-weight: 700; letter-spacing: -.01em; }
+  .sub { font-size: 13px; color: var(--app-muted); margin-top: 2px; }
+  .h2 { font-size: 16px; font-weight: 700; }
+  .lab { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--app-faint); }
+  .muted { color: var(--app-muted); }
+  .faint { color: var(--app-faint); }
+  .xs { font-size: 12px; }
+  .stack { display: flex; flex-direction: column; gap: 18px; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .grid { display: grid; gap: 14px; }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+
+  .btn { display: inline-flex; align-items: center; gap: 7px; border-radius: 9px; padding: 8px 14px; font-size: 13px; font-weight: 700; border: 1px solid transparent; }
+  .btn-primary { background: var(--brand-600); color: #fff; }
+  .btn-primary:hover { background: var(--brand-700); }
+  .btn-ghost { background: #fff; color: var(--app-ink-2); border-color: var(--app-line); }
+  .btn-ghost:hover { background: #f8fafc; }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .btn.sm { padding: 6px 11px; font-size: 12px; }
+
+  .input, select.input {
+    width: 100%; border: 1px solid #cbd5e1; border-radius: 9px; padding: 8px 11px;
+    font-size: 13px; background: #fff; color: var(--app-ink);
+  }
+  .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 700; }
+  .b-pending { background: var(--warn-bg); color: var(--warn-ink); }
+  .b-scheduled { background: var(--brand-100); color: var(--brand-700); }
+  .b-completed { background: var(--ok-bg); color: var(--ok-ink); }
+  .b-cancelled { background: var(--bad-bg); color: var(--bad-ink); }
+  .b-deferred { background: #e2e8f0; color: #475569; }
+  .b-tag { background: var(--accent-100); color: var(--accent-600); }
+  .b-flat { background: #f1f5f9; color: #475569; }
+
+  table th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--app-faint); padding: 11px 14px; border-bottom: 1px solid var(--app-line); }
+  table td { padding: 11px 14px; font-size: 13px; color: var(--app-ink-2); border-bottom: 1px solid #f1f5f9; }
+  table tr:last-child td { border-bottom: 0; }
+  tr.click:hover td { background: var(--brand-50); cursor: pointer; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  .avatar { width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex: 0 0 auto; }
+
+  .stat { display: flex; align-items: center; gap: 13px; }
+  .stat .orb { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 19px; color: #fff; }
+  .stat .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--app-line); }
+  .tabs button { border: 0; background: transparent; padding: 9px 13px; font-size: 13px; font-weight: 600; color: var(--app-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs button[aria-selected="true"] { color: var(--brand-700); border-bottom-color: var(--brand-600); }
+
+  .lockline { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-100); border: 1px solid #ddd6fe; color: #5b21b6; border-radius: 12px; padding: 12px 14px; font-size: 12.5px; }
+  .lockline b { display: block; font-size: 13px; }
+  .denied { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px 14px; font-size: 12.5px; color: var(--app-muted); }
+
+  /* calendar */
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 1px; background: var(--app-line); border: 1px solid var(--app-line); border-radius: 12px; overflow: hidden; }
+  .cal .dow { background: #f8fafc; padding: 7px 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--app-faint); text-align: center; }
+  .cal .day { background: #fff; min-height: 84px; padding: 5px 6px; display: flex; flex-direction: column; gap: 3px; }
+  .cal .day.off { background: #f8fafc; }
+  .cal .dnum { font-size: 11px; font-weight: 700; color: var(--app-faint); font-variant-numeric: tabular-nums; }
+  .cal .day.today .dnum { background: var(--brand-600); color: #fff; border-radius: 999px; padding: 0 6px; align-self: flex-start; }
+  .chipapp { font-size: 10.5px; border-radius: 5px; padding: 2px 5px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-pending { background: var(--warn-bg); color: var(--warn-ink); border-left: 2px solid #f59e0b; font-weight: 700; }
+  .c-scheduled { background: var(--brand-100); color: var(--brand-700); }
+  .c-completed { background: var(--ok-bg); color: var(--ok-ink); }
+  .c-cancelled { background: var(--bad-bg); color: var(--bad-ink); text-decoration: line-through; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--app-muted); }
+  .dot { width: 9px; height: 9px; border-radius: 999px; display: inline-block; margin-right: 5px; }
+
+  /* odontogram */
+  .arch { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .quadrow { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .quad { display: flex; gap: 3px; }
+  .tooth { width: 28px; border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tooth .glyph { width: 26px; height: 32px; border-radius: 7px 7px 10px 10px; border: 1.5px solid #cbd5e1; background: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #475569; }
+  .tooth.small .glyph { height: 24px; width: 22px; border-radius: 6px 6px 9px 9px; }
+  .tooth.small { width: 24px; }
+  .tooth .no { font-size: 9.5px; color: var(--app-faint); font-variant-numeric: tabular-nums; }
+  .tooth:hover .glyph { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--brand-100); }
+  .palette { display: flex; gap: 6px; flex-wrap: wrap; }
+  .swatch { border: 1px solid var(--app-line); background: #fff; border-radius: 999px; padding: 4px 11px; font-size: 11.5px; font-weight: 700; display: inline-flex; gap: 5px; align-items: center; }
+  .swatch[aria-pressed="true"] { color: #fff; border-color: transparent; }
+
+  /* booking + pricing (chrome-side surfaces) */
+  .sheet { background: var(--page-card); border: 1px solid var(--page-line); border-radius: var(--r); padding: 24px; }
+  .price { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; }
+  .tier { background: var(--page-card); border: 1px solid var(--page-line); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+  .tier.pop { border: 2px solid var(--brand-500); box-shadow: 0 18px 40px -26px rgba(2,132,199,.7); }
+  .tier .flag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--brand-600); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+  .tier h3 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand-600); font-weight: 800; }
+  .tier.acc h3 { color: var(--accent-600); }
+  .tier .amt { font-family: var(--display); font-size: 42px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .tier ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--page-ink-2); }
+  .tier li { display: flex; gap: 9px; align-items: flex-start; }
+  .tier li .tick { color: var(--brand-600); font-weight: 800; }
+  .tier li.lead { font-weight: 700; color: var(--page-ink); margin-top: 4px; }
+  .strike { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--page-muted); font-weight: 700; }
+
+  .chipbtn { border: 1px solid var(--app-line); background: #fff; border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; color: var(--app-ink-2); display: inline-flex; gap: 7px; align-items: center; }
+  .chipbtn[aria-pressed="true"] { background: var(--brand-600); border-color: var(--brand-600); color: #fff; }
+  .chipbtn[disabled] { background: #f8fafc; color: var(--app-faint); }
+  .slots { font-size: 10.5px; font-weight: 700; opacity: .8; }
+
+  /* toast + tour */
+  .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+  .toast { background: #0f172a; color: #e2e8f0; border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); }
+  .tour {
+    position: fixed; z-index: 95; left: 50%; transform: translateX(-50%);
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    width: min(560px, calc(100vw - 32px));
+    background: var(--page-ink); color: var(--page-card);
+    border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
+    box-shadow: 0 20px 50px -18px rgba(0,0,0,.6);
+  }
+  :root[data-theme="dark"] .tour, :root:not([data-theme="light"]) .tour { }
+  .tour .step { font-family: var(--display); font-size: 13px; font-weight: 800; opacity: .6; flex: 0 0 auto; padding-top: 2px; }
+  .tour h4 { font-family: var(--display); font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+  .tour p { font-size: 13px; opacity: .8; margin-top: 3px; }
+  .tour .acts { display: flex; gap: 8px; margin-top: 11px; }
+  .tour button { border-radius: 999px; border: 1px solid rgba(255,255,255,.28); background: transparent; color: inherit; padding: 6px 14px; font-size: 12.5px; font-weight: 700; }
+  .tour button.go { background: var(--brand-500); border-color: transparent; color: #04212f; }
+  [data-spot] { outline: 3px solid var(--brand-400); outline-offset: 3px; border-radius: 12px; }
+
+  .foot { padding-block: 26px 8px; font-size: 12.5px; color: var(--page-muted); display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; }
+</style>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="lockup">
+      <img src="softeeth-mark.png" alt="">
+      <span>
+        <b>softeeth</b>
+        <span>Dental Records, Simplified.</span>
+      </span>
+    </div>
+
+    <div class="seg" id="seg" role="group" aria-label="Demo section">
+      <button data-seg="app" aria-pressed="true">Clinic app</button>
+      <button data-seg="book" aria-pressed="false">Patient booking</button>
+      <button data-seg="plans" aria-pressed="false">Plans</button>
+    </div>
+
+    <label class="ctrl">Signed in as
+      <select id="roleSel" aria-label="Demo role">
+        <option value="owner">Dr. Santillan · Owner</option>
+        <option value="dentist">Dr. Ramirez · Dentist</option>
+        <option value="staff">Aileen Cruz · Front desk</option>
+      </select>
+    </label>
+    <label class="ctrl">Plan
+      <select id="planSel" aria-label="Demo subscription plan">
+        <option value="solo">Solo</option>
+        <option value="clinic">Clinic</option>
+        <option value="pro" selected>Pro</option>
+      </select>
+    </label>
+    <a class="homebtn" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to site
+    </a>
+    <button class="tourbtn" id="tourBtn">Take the 6-stop tour</button>
+  </header>
+
+  <p class="note">
+    <b>Live demo, sample clinic.</b>
+    Nothing here is a real patient. Click any row, tooth, chip or tab — and switch the role or plan above to watch the
+    app change shape around whoever is signed in.
+  </p>
+
+  <div id="root"></div>
+
+  <footer class="foot">
+    <span>Softeeth — dental clinic management for Philippine practices.</span>
+    <span>Figures in ₱. Times in Asia/Manila.</span>
+  </footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =======================================================================
+     DEMO DATA — one sample practice, filled the way a real one looks in
+     month nine: some balances outstanding, two items low, three requests
+     waiting, one record opened from a booking and still incomplete.
+     ======================================================================= */
+
+  var TODAY = new Date(2026, 8, 24); // 24 Sep 2026, Asia/Manila
+  var MONTH_LABEL = "September 2026";
+
+  var STAFF = {
+    owner:   { name: "Dr. Maria Santillan", role: "owner",   initials: "MS", color: "#7c3aed", greet: "Maria" },
+    dentist: { name: "Dr. Joseph Ramirez",  role: "dentist", initials: "JR", color: "#0284c7", greet: "Joseph" },
+    staff:   { name: "Aileen Cruz",         role: "staff",   initials: "AC", color: "#059669", greet: "Aileen" }
+  };
+
+  // Privilege sheet, transcribed from the product's ROLE_MATRIX.
+  var PERM = {
+    owner:   { patient:["view"], clinical:["view"], appointment:["view"], request:["view"],
+               finance:["view","edit"], inventory:["view"], directory:["view","edit"], admin:["view","edit"] },
+    dentist: { patient:["view","edit"], clinical:["view","edit"], appointment:["view"], request:["view","edit"],
+               finance:[], inventory:["view"], directory:["view","edit"], admin:[] },
+    staff:   { patient:["view","edit"], clinical:["view"], appointment:["view","edit"], request:["view","edit"],
+               finance:[], inventory:["view","edit"], directory:["view","edit"], admin:[] }
+  };
+
+  var PLANS = {
+    solo: {
+      name: "Solo", price: "399", regular: "499",
+      tagline: "For the single-chair practice or associate.",
+      features: [],
+      quota: { dentists: 1, staff: 2, patients: 1000, photos: 2000, locations: 1 },
+      list: ["1 Dentist · 2 Staff accounts","1,000 Patient Records","2,000 Patient Photos",
+             "Unlimited Appointments","Online Booking & Screening Form","Dental Charting & Progress Notes",
+             "Lab Cases & Ortho Records","Basic Income / Expense Tracking"]
+    },
+    clinic: {
+      name: "Clinic", price: "799", regular: "999", popular: true,
+      tagline: "For the growing 2–4 dentist group.",
+      features: ["finance_suite","commission_reports","inventory"],
+      quota: { dentists: 3, staff: 6, patients: 15000, photos: 25000, locations: 1 },
+      list: ["3 Dentists · 6 Staff accounts","15,000 Patient Records","25,000 Patient Photos",
+             "LEAD:Everything in Solo, plus:","Finance Suite & PDF Ledger Export","Dentist Commission Reports",
+             "Inventory Management","Priority Support"]
+    },
+    pro: {
+      name: "Pro", price: "1,599", regular: "1,999", accent: true,
+      tagline: "For multi-dentist practices, scaling up.",
+      features: ["finance_suite","commission_reports","inventory","multi_branch",
+                 "custom_branding","daily_slot_limits","chart_annotation","executive_analytics"],
+      quota: { dentists: 10, staff: null, patients: null, photos: 75000, locations: 3 },
+      list: ["10 Dentists · Unlimited Staff","Unlimited Patient Records","75,000 Photos + add-on packs",
+             "LEAD:Everything in Clinic, plus:","Granular Per-user Permissions (configured on request)",
+             "Multi-Branch Management — up to 3 locations","Executive Analytics Dashboard",
+             "Custom Branding & White-label","Audit Logs & Activity History",
+             "Custom Reports & Dashboard","Dedicated Onboarding + Priority Support"]
+    }
+  };
+
+  var USAGE = { dentists: 2, staff: 3, patients: 1284, photos: 3140, locations: 2 };
+
+  var PATIENTS = [
+    { id:1, last:"Reyes", first:"Angelica M.", sex:"Female", age:29, phone:"0917 555 2841",
+      addr:"12 Lahug St., Cebu City", tags:["Ortho"], last_visit:"18 Sep 2026", balance:8500,
+      dentist:"Dr. Ramirez", since:"Feb 2026" },
+    { id:2, last:"Dela Cruz", first:"Marco", sex:"Male", age:41, phone:"0918 220 1174",
+      addr:"Banilad, Mandaue City", tags:["Recall"], last_visit:"12 Sep 2026", balance:0,
+      dentist:"Dr. Ramirez", since:"Nov 2025" },
+    { id:3, last:"Tan", first:"Bianca L.", sex:"Female", age:34, phone:"0906 771 9020",
+      addr:"Guadalupe, Cebu City", tags:["VIP"], last_visit:"22 Sep 2026", balance:1500,
+      dentist:"Dr. Santillan", since:"Aug 2024" },
+    { id:4, last:"Villanueva", first:"Paolo", sex:"Male", age:8, phone:"0920 118 4423",
+      addr:"Talamban, Cebu City", tags:["Pedia"], last_visit:"30 Aug 2026", balance:0,
+      dentist:"Dr. Ramirez", since:"Jan 2026" },
+    { id:5, last:"Mendoza", first:"Grace", sex:"Female", age:52, phone:"0917 340 6688",
+      addr:"Basak, Lapu-Lapu City", tags:["Perio"], last_visit:"09 Sep 2026", balance:3200,
+      dentist:"Dr. Santillan", since:"Jun 2025" },
+    { id:6, last:"Aquino", first:"Ramon S.", sex:"Male", age:63, phone:"0995 442 1039",
+      addr:"Capitol Site, Cebu City", tags:[], last_visit:"21 Jul 2026", balance:0,
+      dentist:"Dr. Ramirez", since:"Mar 2023" },
+    { id:7, last:"Lim", first:"Katrina", sex:"Female", age:26, phone:"0916 882 7741",
+      addr:"Mabolo, Cebu City", tags:["Ortho"], last_visit:"23 Sep 2026", balance:12000,
+      dentist:"Dr. Ramirez", since:"May 2026" },
+    { id:8, last:"Bautista", first:"Elmer", sex:"Male", age:37, phone:"0927 604 3318",
+      addr:"Consolacion, Cebu", tags:[], last_visit:"02 Sep 2026", balance:0,
+      dentist:"Dr. Santillan", since:"Sep 2026" }
+  ];
+
+  // Angelica Reyes — an ortho case, so the money lives on the contract.
+  var NOTES = [
+    { id:1, date:"18 Sep 2026", dentist:"Dr. Ramirez", cat:"Orthodontics",
+      procedure:"Monthly adjustment, upper & lower. Power chain 13–23. Patient reports mild soreness day 2, settling.",
+      fee:0, other:0, paid:1500, ortho:1500, editable:true },
+    { id:2, date:"21 Aug 2026", dentist:"Dr. Ramirez", cat:"Orthodontics",
+      procedure:"Adjustment. Archwire stepped to 16x22 NiTi upper.",
+      fee:0, other:0, paid:1500, ortho:1500, editable:false },
+    { id:3, date:"24 Jul 2026", dentist:"Dr. Ramirez", cat:"Orthodontics",
+      procedure:"Bonding, full upper and lower. Contract opened — 18 months projected.",
+      fee:0, other:0, paid:15000, ortho:15000, editable:false, opened:true },
+    { id:4, date:"10 Jul 2026", dentist:"Dr. Santillan", cat:"Oral Prophylaxis",
+      procedure:"Full-mouth scaling and polishing. Pre-ortho clearance.",
+      fee:1800, other:450, paid:2250, ortho:0, editable:false, otherLines:[["Fluoride varnish","450.00"]] }
+  ];
+
+  var ORTHO = {
+    total: 62000, deposit: 15000, discount: 2000, paid: 51500,
+    status: "active", started: "24 Jul 2026", dentist: "Dr. Ramirez",
+    payments: [
+      { date:"18 Sep 2026", kind:"Installment", amount:1500, method:"Cash", after:10500 },
+      { date:"21 Aug 2026", kind:"Installment", amount:1500, method:"GCash", after:12000 },
+      { date:"12 Aug 2026", kind:"Adjustment charge", amount:3500, method:"—", after:13500, charge:true },
+      { date:"24 Jul 2026", kind:"Deposit", amount:15000, method:"Bank transfer", after:45000 },
+      { date:"24 Jul 2026", kind:"Installment", amount:30000, method:"Card", after:15000 }
+    ]
+  };
+
+  var CONDITIONS = {
+    caries:      { label:"Caries",      sym:"C",  color:"#ef4444" },
+    filled:      { label:"Filled",      sym:"F",  color:"#2563eb" },
+    crown:       { label:"Crown",       sym:"Cr", color:"#7c3aed" },
+    root_canal:  { label:"Root canal",  sym:"Rc", color:"#db2777" },
+    sealant:     { label:"Sealant",     sym:"S",  color:"#16a34a" },
+    extracted:   { label:"Missing",     sym:"✕",  color:"#dc2626" },
+    for_extraction:{ label:"For extraction", sym:"⊗", color:"#be123c" },
+    implant:     { label:"Implant",     sym:"Im", color:"#ca8a04" }
+  };
+  var CHART = { 16:"filled", 26:"caries", 36:"root_canal", 46:"crown", 18:"extracted", 28:"for_extraction", 11:"filled" };
+
+  var UPPER_R = [18,17,16,15,14,13,12,11], UPPER_L = [21,22,23,24,25,26,27,28];
+  var LOWER_R = [48,47,46,45,44,43,42,41], LOWER_L = [31,32,33,34,35,36,37,38];
+  var PUP_R = [55,54,53,52,51], PUP_L = [61,62,63,64,65];
+  var PLO_R = [85,84,83,82,81], PLO_L = [71,72,73,74,75];
+
+  var APPTS = {
+    1:  [["09:00","Dela Cruz, Marco","completed"],["14:00","Uy, Sheena","completed"]],
+    3:  [["10:30","Tan, Bianca L.","completed"]],
+    4:  [["09:00","Villanueva, Paolo","cancelled"]],
+    8:  [["08:30","Mendoza, Grace","completed"],["11:00","Reyes, Angelica M.","completed"]],
+    9:  [["13:00","Mendoza, Grace","completed"]],
+    11: [["09:30","Lim, Katrina","completed"],["15:00","Bautista, Elmer","completed"]],
+    15: [["10:00","Aquino, Ramon S.","completed"]],
+    18: [["11:00","Reyes, Angelica M.","completed"],["16:00","Tan, Bianca L.","completed"]],
+    22: [["09:00","Tan, Bianca L.","completed"]],
+    23: [["14:30","Lim, Katrina","completed"]],
+    24: [["09:00","Reyes, Angelica M.","scheduled"],["10:30","Villanueva, Paolo","scheduled"],
+         ["13:00","Mendoza, Grace","scheduled"],["15:00","Dela Cruz, Marco","pending"],
+         ["16:30","Ferrer, Luis","pending"]],
+    25: [["09:30","Bautista, Elmer","scheduled"],["11:00","Lim, Katrina","scheduled"]],
+    28: [["10:00","Aquino, Ramon S.","scheduled"]],
+    29: [["09:00","Reyes, Angelica M.","scheduled"],["14:00","Tan, Bianca L.","pending"]],
+    30: [["11:30","Mendoza, Grace","scheduled"]]
+  };
+
+  var TODAY_LIST = [
+    { t:"09:00", name:"Reyes, Angelica M.", reason:"Ortho adjustment", dds:"Dr. Ramirez", status:"scheduled" },
+    { t:"10:30", name:"Villanueva, Paolo", reason:"Fluoride treatment", dds:"Dr. Ramirez", status:"scheduled" },
+    { t:"13:00", name:"Mendoza, Grace", reason:"Perio maintenance", dds:"Dr. Santillan", status:"scheduled" },
+    { t:"15:00", name:"Dela Cruz, Marco", reason:"Tooth extraction", dds:"Unassigned", status:"pending" },
+    { t:"16:30", name:"Ferrer, Luis", reason:"Consultation · Teeth whitening", dds:"Unassigned", status:"pending" }
+  ];
+
+  var REQUESTS = [
+    { id:1, name:"Ferrer, Luis", phone:"0917 208 4412", type:"New patient", reason:"Consultation, Teeth whitening",
+      when:"24 Sep 2026 · 4:30 PM", via:"Facebook page", remarks:"Prefers late afternoon. Works nearby.", status:"pending" },
+    { id:2, name:"Dela Cruz, Marco", phone:"0918 220 1174", type:"Returning patient", reason:"Tooth extraction",
+      when:"24 Sep 2026 · 3:00 PM", via:"Referred by Grace Mendoza", remarks:"Lower right molar, painful since Sunday.", status:"pending" },
+    { id:3, name:"Ong, Cherry Mae", phone:"0921 776 5530", type:"New patient", reason:"Oral prophylaxis, Consultation",
+      when:"29 Sep 2026 · 2:00 PM", via:"Walk-past signage", remarks:"", status:"pending" }
+  ];
+
+  var INCOME = [
+    ["24 Sep 2026","Reyes, Angelica M.","Orthodontics","Cashier — Main","Dr. Ramirez",1500],
+    ["23 Sep 2026","Lim, Katrina","Orthodontics","Cashier — Main","Dr. Ramirez",1500],
+    ["22 Sep 2026","Tan, Bianca L.","Restorative","Cashier — Main","Dr. Santillan",3500],
+    ["22 Sep 2026","Walk-in","Oral Prophylaxis","Cashier — Annex","Dr. Ramirez",1200],
+    ["18 Sep 2026","Reyes, Angelica M.","Orthodontics","Cashier — Main","Dr. Ramirez",1500],
+    ["15 Sep 2026","Aquino, Ramon S.","Prosthodontics","Cashier — Main","Dr. Ramirez",8500],
+    ["12 Sep 2026","Dela Cruz, Marco","Surgery","Cashier — Main","Dr. Ramirez",2800],
+    ["09 Sep 2026","Mendoza, Grace","Periodontics","Cashier — Main","Dr. Santillan",4500]
+  ];
+  var EXPENSE = [
+    ["23 Sep 2026","Dental Depot Cebu","Supplies","Cashier — Main",6480],
+    ["20 Sep 2026","Smile Craft Dental Lab","Lab fees","Cashier — Main",9200],
+    ["15 Sep 2026","VECO","Utilities","Cashier — Main",7340],
+    ["10 Sep 2026","Clinic rent — Main","Rent","Cashier — Main",25000],
+    ["05 Sep 2026","Autoclave servicing","Equipment","Cashier — Annex",3500]
+  ];
+
+  var COMMISSION = [
+    ["Reyes, Angelica M.","Orthodontics",1500,0,"40%",600],
+    ["Lim, Katrina","Orthodontics",1500,0,"40%",600],
+    ["Walk-in","Oral Prophylaxis",1200,0,"40%",480],
+    ["Aquino, Ramon S.","Prosthodontics",8500,3200,"Fixed","800"],
+    ["Dela Cruz, Marco","Surgery",2800,0,"30%",840]
+  ];
+  var RATES = [
+    { dds:"Dr. Joseph Ramirez", init:"JR", color:"#0284c7", base:"30%",
+      rules:[["Orthodontics","40%"],["Prosthodontics","Fixed ₱800"],["Oral Prophylaxis","40%"]] },
+    { dds:"Dr. Maria Santillan", init:"MS", color:"#7c3aed", base:"—",
+      rules:[["Owner — not on commission",""]] }
+  ];
+
+  var STOCK = [
+    ["Composite resin A2","3M Filtek Z350",4,"syringe",6,20,"Mar 2027","Dental Depot Cebu","Main"],
+    ["Lidocaine 2% w/ epi","Septodont",38,"carpule",24,120,"Nov 2026","MedSupply PH","Main"],
+    ["Prophy paste — mint","Nupro",2,"jar",5,24,"Jun 2027","Dental Depot Cebu","Main"],
+    ["Disposable bibs","GenericMed",310,"pc",150,600,"—","MedSupply PH","Main"],
+    ["Orthodontic brackets MBT","Ormco",22,"kit",10,40,"—","OrthoLine Asia","Main"],
+    ["Impression alginate","Kromopan",9,"bag",6,18,"Feb 2027","Dental Depot Cebu","Annex"],
+    ["Fluoride varnish 5%","Duraphat",14,"tube",8,30,"Aug 2027","MedSupply PH","Annex"],
+    ["Gauze 2x2 sterile","GenericMed",64,"pack",40,150,"Dec 2028","MedSupply PH","Main"]
+  ];
+
+  var DIRECTORY = [
+    ["Smile Craft Dental Lab","Dental laboratory","0932 118 4470","Mandaue City","Crowns, dentures, retainers"],
+    ["Cebu Oral & Maxillofacial","Referral — surgery","0917 550 2210","Cebu City","Dr. Alfonso Yap"],
+    ["MedSupply PH","Supplier","0917 300 1188","Cebu City","Consumables, 3-day delivery"],
+    ["OrthoLine Asia","Supplier","0908 442 7711","Manila","Brackets, wires, aligner trays"],
+    ["Dental Depot Cebu","Supplier","032 255 8890","Cebu City","Restorative, prophy"]
+  ];
+
+  var BRANCHES = [
+    { name:"Softeeth Dental Care — Main", city:"Cebu City", staff:4, patients:1102, stock:41, main:true },
+    { name:"Softeeth Dental Care — Annex", city:"Mandaue City", staff:2, patients:182, stock:17 }
+  ];
+
+  var VISIT_REASONS = [
+    { name:"Consultation", cap:null, booked:3 },
+    { name:"Oral Prophylaxis", cap:6, booked:4 },
+    { name:"Tooth Extraction", cap:3, booked:3 },
+    { name:"Restoration / Pasta", cap:8, booked:2 },
+    { name:"Orthodontic Adjustment", cap:10, booked:5 },
+    { name:"Teeth Whitening", cap:2, booked:0 },
+    { name:"Denture / Prosthesis", cap:null, booked:1 },
+    { name:"Root Canal Treatment", cap:2, booked:1 },
+    { name:"Dental X-ray", cap:null, booked:2 },
+    { name:"Others", cap:null, booked:0 }
+  ];
+
+  var REVENUE = [
+    { m:"Apr", inc: 268400, exp: 171200 },
+    { m:"May", inc: 291800, exp: 183600 },
+    { m:"Jun", inc: 244900, exp: 176400 },
+    { m:"Jul", inc: 318600, exp: 194100 },
+    { m:"Aug", inc: 342200, exp: 201800 },
+    { m:"Sep", inc: 289300, exp: 165900 }
+  ];
+  var MIX = [
+    ["Orthodontics", 96500, "#0284c7"],
+    ["Restorative", 61200, "#7c3aed"],
+    ["Prosthodontics", 48300, "#059669"],
+    ["Surgery", 35400, "#d97706"],
+    ["Periodontics", 28600, "#db2777"],
+    ["Prophylaxis", 19300, "#0891b2"]
+  ];
+
+  /* =======================================================================
+     STATE
+     ======================================================================= */
+
+  var S = {
+    seg: "app",
+    screen: "dashboard",
+    role: "owner",
+    plan: "pro",
+    patient: null,
+    ptab: "overview",
+    ftab: "income",
+    atab: "staff",
+    tool: null,
+    chart: Object.assign({}, CHART),
+    requests: REQUESTS.map(function (r) { return Object.assign({}, r); }),
+    extraPatients: [],
+    navOpen: false,
+    book: { reasons: [], type: "new", date: 26 },
+    tour: -1
+  };
+
+  function can(fn, act) { return (PERM[S.role][fn] || []).indexOf(act) >= 0; }
+  function has(f) { return PLANS[S.plan].features.indexOf(f) >= 0; }
+  function me() { return STAFF[S.role]; }
+  function pending() { return S.requests.filter(function (r) { return r.status === "pending"; }).length; }
+  function allPatients() { return S.extraPatients.concat(PATIENTS); }
+
+  function peso(n, dec) {
+    var v = Number(n).toLocaleString("en-PH", {
+      minimumFractionDigits: dec === false ? 0 : 2,
+      maximumFractionDigits: dec === false ? 0 : 2
+    });
+    return "₱" + v;
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+  function initials(n) {
+    var p = String(n).replace(",", " ").trim().split(/\s+/);
+    return ((p[0] || "")[0] + (p[1] || "")[0] || "?").toUpperCase();
+  }
+  var AV = ["#0284c7","#7c3aed","#059669","#d97706","#db2777","#0891b2","#4f46e5"];
+  function avatar(name, size) {
+    var c = AV[(String(name).length + String(name).charCodeAt(0)) % AV.length];
+    var s = size || 34;
+    return '<span class="avatar" style="background:' + c + ';width:' + s + 'px;height:' + s +
+      'px;font-size:' + Math.round(s * 0.36) + 'px">' + esc(initials(name)) + "</span>";
+  }
+  function badge(status) {
+    return '<span class="badge b-' + status + '">' + status + "</span>";
+  }
+  function sum(a, i) { return a.reduce(function (t, r) { return t + r[i]; }, 0); }
+
+  /* =======================================================================
+     NAVIGATION — the same three gates the product applies.
+     ======================================================================= */
+
+  var NAV = [
+    { id:"dashboard", label:"Dashboard", icon:"🏠" },
+    { id:"patients", label:"Patients", icon:"🦷", perm:["patient","view"] },
+    { id:"appointments", label:"Appointments", icon:"📅", perm:["appointment","view"] },
+    { id:"requests", label:"Requests", icon:"📨", perm:["request","view"], badge:true },
+    { id:"finance", label:"Finance", icon:"💰", perm:["finance","view"] },
+    { id:"reports", label:"Reports", icon:"📊", perm:["finance","view"], feat:"finance_suite" },
+    { id:"commission", label:"Dentist Commission", icon:"🧾", perm:["finance","view"], feat:"commission_reports" },
+    { id:"inventory", label:"Inventory", icon:"📦", perm:["inventory","view"], feat:"inventory" },
+    { id:"directory", label:"Directory", icon:"📇", perm:["directory","view"] },
+    { id:"admin", label:"Admin", icon:"⚙️", perm:["admin","view"] }
+  ];
+  function navItems() {
+    return NAV.filter(function (n) {
+      if (n.feat && !has(n.feat)) return false;
+      if (n.perm && !can(n.perm[0], n.perm[1])) return false;
+      return true;
+    });
+  }
+
+  /* =======================================================================
+     SCREENS
+     ======================================================================= */
+
+  function statCard(label, value, sub, icon, from, to) {
+    return '<div class="card stat"><div class="orb" style="background:linear-gradient(135deg,' + from + ',' + to + ')">' +
+      icon + '</div><div><p class="lab">' + esc(label) + '</p><p class="v tnum">' + value + '</p>' +
+      (sub ? '<p class="xs faint">' + sub + "</p>" : "") + "</div></div>";
+  }
+
+  function screenDashboard() {
+    var showMoney = can("finance", "view");
+    var cards =
+      statCard("Total patients", USAGE.patients.toLocaleString("en-PH"), "+34 this month", "🦷", "#0ea5e9", "#0284c7") +
+      statCard("Today's appointments", "5", "9 upcoming this week", "📅", "#8b5cf6", "#7c3aed") +
+      (showMoney ? statCard("Today's income", peso(12400, false), "Expense " + peso(6480, false), "💰", "#10b981", "#059669") : "") +
+      statCard("Reorder alerts", "2", "items below reorder level", "📦", "#f59e0b", "#d97706");
+
+    var sched = TODAY_LIST.map(function (a) {
+      return '<li class="row" style="padding:10px 0;border-bottom:1px solid #f1f5f9">' +
+        avatar(a.name, 38) +
+        '<span style="min-width:0;flex:1"><span style="display:block;font-weight:700">' + esc(a.name) + "</span>" +
+        '<span class="xs faint">' + esc(a.reason) + " · " + esc(a.dds) + "</span></span>" +
+        '<span style="text-align:right"><span style="display:block;font-weight:700" class="tnum">' + a.t + "</span>" +
+        badge(a.status) + "</span></li>";
+    }).join("");
+
+    var alerts = "";
+    if (can("request", "view") && pending() > 0) {
+      alerts += '<button class="between" data-act="go" data-screen="requests" style="width:100%;text-align:left;border:1px solid #fde68a;background:var(--warn-bg);border-radius:12px;padding:12px">' +
+        '<span style="font-size:13px;font-weight:600;color:var(--warn-ink)">📨 ' + pending() +
+        " appointment request" + (pending() === 1 ? "" : "s") + " to review</span><span style=\"color:#d97706\">→</span></button>";
+    }
+    alerts += ["Composite resin A2 low (4 syringe)", "Prophy paste — mint low (2 jar)"].map(function (t) {
+      return '<div style="background:var(--bad-bg);border:1px solid #fecdd3;border-radius:12px;padding:12px;font-size:13px;color:var(--bad-ink)">📦 ' + esc(t) + "</div>";
+    }).join("");
+
+    return '<div class="stack">' +
+      '<div><h1 class="h1">Good day, ' + esc(me().greet) + " 👋</h1>" +
+      '<p class="sub">Here\'s what\'s happening at your clinic today · ' + esc(MONTH_LABEL) + ', Thursday the 24th.</p></div>' +
+      '<div class="grid g4" data-spot-key="stats">' + cards + "</div>" +
+      '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(290px,1fr))">' +
+        '<div class="card" style="grid-column:span 2;min-width:0">' +
+          '<div class="between" style="margin-bottom:6px"><h2 class="h2">Today\'s schedule</h2>' +
+          '<button class="btn btn-ghost sm" data-act="go" data-screen="appointments">View calendar →</button></div>' +
+          '<ul style="list-style:none;margin:0;padding:0">' + sched + "</ul></div>" +
+        '<div class="card"><h2 class="h2" style="margin-bottom:12px">Tasks &amp; alerts</h2>' +
+          '<div class="stack" style="gap:10px">' + alerts + "</div></div>" +
+      "</div></div>";
+  }
+
+  function screenPatients() {
+    var rows = allPatients().map(function (p) {
+      var tags = p.tags.map(function (t) { return '<span class="badge b-tag">' + esc(t) + "</span>"; }).join(" ");
+      if (p.incomplete) tags += ' <span class="badge b-pending">incomplete</span>';
+      return '<tr class="click" data-act="patient" data-id="' + p.id + '">' +
+        "<td>" + '<span class="row" style="gap:10px;flex-wrap:nowrap">' + avatar(p.last + " " + p.first) +
+          '<span><span style="display:block;font-weight:700;color:var(--app-ink)">' + esc(p.last) + ", " + esc(p.first) + "</span>" +
+          '<span class="xs faint">' + (p.age ? p.age + " · " + p.sex : "Details pending") + "</span></span></span></td>" +
+        '<td class="tnum">' + esc(p.phone || "—") + "</td>" +
+        "<td>" + (tags || '<span class="faint">—</span>') + "</td>" +
+        "<td>" + esc(p.last_visit || "—") + "</td>" +
+        '<td class="num ' + (p.balance ? "" : "faint") + '" style="font-weight:' + (p.balance ? 700 : 400) + ';color:' +
+          (p.balance ? "var(--bad-ink)" : "inherit") + '">' + (p.balance ? peso(p.balance) : "—") + "</td></tr>";
+    }).join("");
+
+    var addBtn = can("patient", "edit")
+      ? '<button class="btn btn-primary" data-act="toast" data-msg="Demo — the real form opens here.">+ New patient</button>'
+      : '<span class="badge b-flat" title="The owner is read-only on the clinical record">View only</span>';
+
+    return '<div class="stack">' +
+      '<div class="between"><div><h1 class="h1">Patients</h1>' +
+      '<p class="sub">' + allPatients().length + ' of ' + USAGE.patients.toLocaleString("en-PH") +
+      " records · click a row to open the chart</p></div>" + addBtn + "</div>" +
+      '<div class="card" style="padding:12px"><div class="row">' +
+        '<input class="input" style="max-width:280px" placeholder="Search name, phone or tag…" aria-label="Search patients">' +
+        '<select class="input" style="max-width:170px" aria-label="Filter by tag"><option>All tags</option><option>Ortho</option><option>Recall</option><option>Pedia</option></select>' +
+        '<select class="input" style="max-width:190px" aria-label="Filter by dentist"><option>All dentists</option><option>Dr. Ramirez</option><option>Dr. Santillan</option></select>' +
+      "</div></div>" +
+      '<div class="card tight"><div class="tablewrap"><table><thead><tr>' +
+        "<th>Patient</th><th>Contact</th><th>Tags</th><th>Last visit</th><th class=\"num\">Balance</th>" +
+        "</tr></thead><tbody>" + rows + "</tbody></table></div></div></div>";
+  }
+
+  var PTABS = [
+    ["overview","Overview"], ["notes","Progress notes"], ["chart","Dental chart"],
+    ["ortho","Ortho"], ["forms","Forms"]
+  ];
+
+  function screenPatient() {
+    var p = allPatients().filter(function (x) { return x.id === S.patient; })[0];
+    if (!p) { S.screen = "patients"; return screenPatients(); }
+
+    var head = '<div class="card"><div class="row" style="gap:14px;align-items:flex-start">' +
+      avatar(p.last + " " + p.first, 54) +
+      '<div style="min-width:0;flex:1"><h1 class="h1">' + esc(p.last) + ", " + esc(p.first) + "</h1>" +
+      '<p class="sub">' + (p.age ? p.age + " · " + p.sex + " · " : "") + esc(p.phone || "no number on file") +
+      " · patient since " + esc(p.since || "—") + "</p>" +
+      '<div class="row" style="margin-top:8px;gap:6px">' +
+        p.tags.map(function (t) { return '<span class="badge b-tag">' + esc(t) + "</span>"; }).join("") +
+        (p.incomplete ? '<span class="badge b-pending">needs completion</span>' : "") +
+      "</div></div>" +
+      '<div style="text-align:right"><p class="lab">Outstanding</p>' +
+      '<p class="tnum" style="font-size:22px;font-weight:700;color:' + (p.balance ? "var(--bad-ink)" : "var(--ok)") + '">' +
+      peso(p.balance) + "</p>" +
+      '<button class="btn btn-ghost sm" style="margin-top:6px" data-act="back">← All patients</button></div>' +
+      "</div>";
+
+    if (p.incomplete) {
+      head += '<div class="card" style="margin-top:12px;background:var(--warn-bg);border-color:#fde68a">' +
+        '<b style="font-size:13px;color:var(--warn-ink)">Record opened from a booking request.</b>' +
+        '<p class="xs" style="color:var(--warn-ink);margin-top:3px">Still missing: last name is fine, but birthdate, sex and address are blank. ' +
+        "The badge clears itself when they are filled in — there is no status to remember to change.</p></div>";
+    }
+
+    var tabs = '<div class="tabs" style="margin:14px 0">' + PTABS.map(function (t) {
+      return '<button data-act="ptab" data-tab="' + t[0] + '" aria-selected="' + (S.ptab === t[0]) + '">' + t[1] + "</button>";
+    }).join("") + "</div>";
+
+    var body = S.ptab === "overview" ? ptabOverview(p)
+      : S.ptab === "notes" ? ptabNotes(p)
+      : S.ptab === "chart" ? ptabChart(p)
+      : S.ptab === "ortho" ? ptabOrtho(p)
+      : ptabForms(p);
+
+    return head + tabs + body;
+  }
+
+  function field(k, v) {
+    return '<div><p class="lab">' + esc(k) + '</p><p style="font-weight:600">' + esc(v || "—") + "</p></div>";
+  }
+  function ptabOverview(p) {
+    var info = '<div class="card"><div class="between" style="margin-bottom:12px"><h2 class="h2">Personal information</h2>' +
+      (can("patient", "edit")
+        ? '<button class="btn btn-ghost sm" data-act="toast" data-msg="Demo — the patient form opens here.">Edit information</button>'
+        : '<span class="badge b-flat">Read-only for the owner</span>') + "</div>" +
+      '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">' +
+      field("Sex", p.sex) + field("Age", p.age ? p.age + " years" : "") + field("Mobile", p.phone) +
+      field("Address", p.addr) + field("Assigned dentist", p.dentist) + field("Last visit", p.last_visit) +
+      "</div></div>";
+
+    var hx = '<div class="card"><h2 class="h2" style="margin-bottom:10px">Medical history</h2>' +
+      '<p class="xs muted" style="margin-bottom:10px">Eleven screening questions; question 11 is the conditions checklist. ' +
+      "The front desk may edit this — the owner may not.</p>" +
+      '<div class="stack" style="gap:8px">' +
+      [["Under medical treatment now?","No"],["Taking any medication?","Yes — losartan 50mg"],
+       ["Allergic to anaesthetic / penicillin?","No"],["Pregnant or nursing?","Not applicable"]].map(function (q) {
+        return '<div class="between" style="border-bottom:1px solid #f1f5f9;padding-bottom:7px">' +
+          '<span style="font-size:13px">' + esc(q[0]) + '</span><span class="badge ' +
+          (q[1] === "No" ? "b-flat" : "b-scheduled") + '">' + esc(q[1]) + "</span></div>";
+      }).join("") +
+      '<div style="padding-top:4px"><p class="lab">Conditions</p>' +
+      '<div class="row" style="gap:6px;margin-top:5px"><span class="badge b-tag">High blood pressure</span>' +
+      '<span class="badge b-tag">Sinusitis</span></div></div></div></div>';
+
+    return '<div class="grid g2">' + info + hx + "</div>";
+  }
+
+  function ptabNotes(p) {
+    var mayWrite = can("clinical", "edit");
+    var head = '<div class="between" style="margin-bottom:12px"><div><h2 class="h2">Progress notes</h2>' +
+      '<p class="xs muted">A note is editable only on the day it was written — after that it is the record.</p></div>' +
+      (mayWrite
+        ? '<button class="btn btn-primary sm" data-act="toast" data-msg="Demo — the note form opens here.">+ Add consultation</button>'
+        : '<span class="badge b-flat">' + (S.role === "owner" ? "Owner: view only" : "Front desk: view only") + "</span>") + "</div>";
+
+    var list = NOTES.map(function (n) {
+      var money = n.ortho
+        ? peso(n.ortho) + (n.opened ? " deposit" : " installment")
+        : peso(n.fee - 0 + n.other);
+      var lines = (n.otherLines || []).map(function (l) {
+        return '<span class="xs faint">' + esc(l[0]) + " — ₱" + esc(l[1]) + "</span>";
+      }).join("<br>");
+      return '<div class="card" style="padding:14px">' +
+        '<div class="between"><div class="row" style="gap:8px">' +
+          '<span class="badge b-scheduled">' + esc(n.cat) + "</span>" +
+          '<span class="xs muted tnum">' + esc(n.date) + "</span>" +
+          '<span class="xs faint">' + esc(n.dentist) + "</span>" +
+        "</div>" +
+        '<div class="row" style="gap:8px"><span class="tnum" style="font-weight:700">' + money + "</span>" +
+        (n.editable && mayWrite
+          ? '<button class="btn btn-ghost sm" data-act="toast" data-msg="Demo — edit window is open for today\'s note.">Edit</button>'
+          : '<span class="badge b-flat" title="Edit window closed">locked</span>') + "</div></div>" +
+        '<p style="margin-top:8px;font-size:13px">' + esc(n.procedure) + "</p>" +
+        (lines ? '<div style="margin-top:6px">' + lines + "</div>" : "") +
+        "</div>";
+    }).join("");
+
+    return head + '<div class="stack" style="gap:10px">' + list + "</div>";
+  }
+
+  function toothBtn(no, small) {
+    var c = S.chart[no];
+    var cond = c ? CONDITIONS[c] : null;
+    var style = cond
+      ? 'border-color:' + cond.color + ';background:' + cond.color + '1a;color:' + cond.color
+      : "";
+    return '<button class="tooth' + (small ? " small" : "") + '" data-act="tooth" data-no="' + no +
+      '" title="Tooth ' + no + (cond ? " — " + cond.label : "") + '">' +
+      '<span class="glyph" style="' + style + '">' + (cond ? cond.sym : "") + "</span>" +
+      '<span class="no">' + no + "</span></button>";
+  }
+  function archRow(a, b, small) {
+    return '<div class="quadrow"><span class="quad">' + a.map(function (n) { return toothBtn(n, small); }).join("") +
+      '</span><span class="quad">' + b.map(function (n) { return toothBtn(n, small); }).join("") + "</span></div>";
+  }
+
+  function ptabChart(p) {
+    var mayEdit = can("clinical", "edit");
+    var palette = Object.keys(CONDITIONS).map(function (k) {
+      var c = CONDITIONS[k];
+      var on = S.tool === k;
+      return '<button class="swatch" data-act="tool" data-tool="' + k + '" aria-pressed="' + on + '"' +
+        (mayEdit ? "" : " disabled") +
+        ' style="' + (on ? "background:" + c.color : "color:" + c.color) + '">' +
+        '<b>' + c.sym + "</b>" + c.label + "</button>";
+    }).join("") +
+    '<button class="swatch" data-act="tool" data-tool="clear" aria-pressed="' + (S.tool === "clear") + '"' +
+      (mayEdit ? "" : " disabled") + ' style="' + (S.tool === "clear" ? "background:#475569" : "") + '">Clear</button>';
+
+    var counts = {};
+    Object.keys(S.chart).forEach(function (t) { counts[S.chart[t]] = (counts[S.chart[t]] || 0) + 1; });
+    var summary = Object.keys(counts).map(function (k) {
+      return '<span class="row" style="gap:5px"><span class="dot" style="background:' + CONDITIONS[k].color + '"></span>' +
+        CONDITIONS[k].label + " <b class=\"tnum\">" + counts[k] + "</b></span>";
+    }).join("");
+
+    var draw = has("chart_annotation")
+      ? '<button class="btn btn-ghost sm" data-act="toast" data-msg="Freehand pen is on — draw straight over the chart.">✏️ Draw</button>'
+      : '<button class="btn btn-ghost sm" disabled title="Pro feature">🔒 Draw — Pro</button>';
+
+    return '<div class="card"><div class="between" style="margin-bottom:10px">' +
+      '<div><h2 class="h2">Dental chart</h2><p class="xs muted">' +
+      (mayEdit ? "Pick a condition, then click a tooth. Click again with Clear to undo it."
+               : "Read-only for your role — hover a tooth to see what is recorded.") +
+      "</p></div>" + draw + "</div>" +
+      '<div class="palette" style="margin-bottom:14px">' + palette + "</div>" +
+      '<div class="arch" style="background:#f8fafc;border:1px solid var(--app-line);border-radius:14px;padding:16px 10px">' +
+        archRow(UPPER_R, UPPER_L) +
+        archRow(PUP_R, PUP_L, true) +
+        '<div style="height:1px;background:var(--app-line);width:min(560px,90%);margin:2px 0"></div>' +
+        archRow(PLO_R, PLO_L, true) +
+        archRow(LOWER_R, LOWER_L) +
+      "</div>" +
+      '<div class="row" class="row muted" style="margin-top:12px;gap:16px;font-size:12px">' + summary + "</div>" +
+      '<p class="xs faint" style="margin-top:10px">Permanent 18–48 and primary 55–85, FDI notation. ' +
+      "The demo draws a schematic; the live app lays this hit-layer over the clinic's own FDI illustration.</p></div>";
+  }
+
+  function ptabOrtho(p) {
+    var bal = ORTHO.total + 3500 - ORTHO.discount - ORTHO.paid;
+    var rows = ORTHO.payments.map(function (x) {
+      return "<tr><td class=\"tnum\">" + esc(x.date) + "</td><td>" +
+        '<span class="badge ' + (x.charge ? "b-pending" : "b-completed") + '">' + esc(x.kind) + "</span></td>" +
+        "<td>" + esc(x.method) + "</td>" +
+        '<td class="num">' + (x.charge ? "+" : "") + peso(x.amount) + "</td>" +
+        '<td class="num faint">' + peso(x.after) + "</td></tr>";
+    }).join("");
+
+    return '<div class="grid g2">' +
+      '<div class="card"><div class="between"><h2 class="h2">Contract</h2><span class="badge b-completed">' + ORTHO.status + "</span></div>" +
+      '<div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-top:12px">' +
+        field("Started", ORTHO.started) + field("Dentist", ORTHO.dentist) +
+        field("Contract total", peso(ORTHO.total)) + field("Adjustment charges", peso(3500)) +
+        field("Discount", "−" + peso(ORTHO.discount)) + field("Collected", peso(ORTHO.paid)) +
+      "</div>" +
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--app-line)" class="between">' +
+      '<span class="lab">Balance</span><span class="tnum" style="font-size:20px;font-weight:700;color:var(--bad-ink)">' + peso(bal) + "</span></div>" +
+      '<p class="xs muted" style="margin-top:10px">Ortho is billed as a contract, not per visit — which is why each ' +
+      "ortho progress note carries a ₱0 fee and the money sits here instead.</p></div>" +
+      '<div class="card tight"><div class="between" style="padding:16px 16px 10px"><h2 class="h2">Payment passbook</h2>' +
+      (can("clinical", "edit") ? '<button class="btn btn-ghost sm" data-act="toast" data-msg="Demo — record payment.">Record payment</button>' : "") +
+      "</div><div class=\"tablewrap\"><table><thead><tr><th>Date</th><th>Kind</th><th>Method</th>" +
+      '<th class="num">Amount</th><th class="num">Balance after</th></tr></thead><tbody>' + rows +
+      "</tbody></table></div></div></div>";
+  }
+
+  function ptabForms(p) {
+    var forms = [
+      ["Prescription", "18 Sep 2026", "Dr. Ramirez", "Mefenamic acid 500mg · #12"],
+      ["Dental certificate", "24 Jul 2026", "Dr. Ramirez", "Fit for ortho treatment"],
+      ["Informed consent", "24 Jul 2026", "Dr. Ramirez", "Signed by patient"]
+    ].map(function (f) {
+      return '<div class="card" style="padding:14px"><div class="between">' +
+        '<div><b style="font-size:14px">' + esc(f[0]) + '</b><p class="xs muted">' + esc(f[3]) + "</p></div>" +
+        '<div class="row"><span class="xs faint tnum">' + esc(f[1]) + "</span>" +
+        '<button class="btn btn-ghost sm" data-act="toast" data-msg="Demo — the document preview opens, then exports to PDF.">Preview &amp; PDF</button>' +
+        "</div></div></div>";
+    }).join("");
+    return '<div class="stack" style="gap:10px"><div class="between"><div><h2 class="h2">Forms &amp; documents</h2>' +
+      '<p class="xs muted">Letterheaded with the clinic\'s own mark, signed with the author\'s stored signature.</p></div>' +
+      (can("clinical", "edit") ? '<button class="btn btn-primary sm" data-act="toast" data-msg="Demo — compose, preview, export.">+ New form</button>' : "") +
+      "</div>" + forms + "</div>";
+  }
+
+  function screenAppointments() {
+    var first = new Date(2026, 8, 1).getDay();
+    var days = 30;
+    var cells = "";
+    for (var i = 0; i < first; i++) cells += '<div class="day off"></div>';
+    for (var d = 1; d <= days; d++) {
+      var list = (APPTS[d] || []).map(function (a) {
+        return '<span class="chipapp c-' + a[2] + '">' + a[0] + " " + esc(a[1].split(",")[0]) + "</span>";
+      }).join("");
+      cells += '<div class="day' + (d === 24 ? " today" : "") + '"><span class="dnum">' + d + "</span>" + list + "</div>";
+    }
+    var trailing = (7 - ((first + days) % 7)) % 7;
+    for (var j = 0; j < trailing; j++) cells += '<div class="day off"></div>';
+
+    var dows = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+      .map(function (x) { return '<div class="dow">' + x + "</div>"; }).join("");
+
+    var write = can("appointment", "edit");
+    return '<div class="stack">' +
+      '<div class="between"><div><h1 class="h1">Appointments</h1>' +
+      '<p class="sub">' + esc(MONTH_LABEL) + (write ? "" : " · view only — the diary belongs to the front desk") + "</p></div>" +
+      (write
+        ? '<button class="btn btn-primary" data-act="toast" data-msg="Demo — the booking form opens here.">+ Book appointment</button>'
+        : '<span class="badge b-flat">View only</span>') + "</div>" +
+      '<div class="card"><div class="cal">' + dows + cells + "</div>" +
+      '<div class="legend" style="margin-top:12px">' +
+        ['<span><span class="dot" style="background:#f59e0b"></span>Pending — needs a decision</span>',
+         '<span><span class="dot" style="background:#0ea5e9"></span>Scheduled</span>',
+         '<span><span class="dot" style="background:#10b981"></span>Completed</span>',
+         '<span><span class="dot" style="background:#f43f5e"></span>Cancelled</span>',
+         '<span><span class="dot" style="background:#94a3b8"></span>Deferred</span>'].join("") +
+      "</div></div></div>";
+  }
+
+  function screenRequests() {
+    var mayAct = can("request", "edit");
+    var items = S.requests.map(function (r) {
+      var done = r.status !== "pending";
+      return '<div class="card" style="' + (done ? "opacity:.6" : "") + '">' +
+        '<div class="between"><div class="row" style="gap:11px">' + avatar(r.name, 42) +
+        '<div><b style="font-size:15px">' + esc(r.name) + "</b>" +
+        '<p class="xs muted tnum">' + esc(r.phone) + " · " + esc(r.when) + "</p></div></div>" +
+        '<div class="row" style="gap:6px"><span class="badge b-tag">' + esc(r.type) + "</span>" +
+        (done ? badge(r.status === "approved" ? "scheduled" : "cancelled") : badge("pending")) + "</div></div>" +
+        '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px">' +
+        field("Reason for visit", r.reason) + field("How they found us", r.via) +
+        field("Remarks", r.remarks || "—") + "</div>" +
+        (done ? "" : (mayAct
+          ? '<div class="row" style="margin-top:13px;gap:8px;border-top:1px solid var(--app-line);padding-top:12px">' +
+            '<button class="btn btn-primary sm" data-act="approve" data-id="' + r.id + '">Approve &amp; open record</button>' +
+            '<button class="btn btn-ghost sm" data-act="decline" data-id="' + r.id + '">Decline</button>' +
+            '<span class="xs faint">Approving accepts the visit — an unmatched name gets a new chart, a matching one is linked.</span></div>'
+          : '<div class="denied" style="margin-top:13px">Your role may read requests but not act on them, so the Approve and Decline ' +
+            "controls are not rendered. Showing a button the server would refuse is how a privilege looks broken.</div>")) +
+        "</div>";
+    }).join("");
+
+    return '<div class="stack">' +
+      '<div><h1 class="h1">Booking requests</h1><p class="sub">' + pending() +
+      " waiting · requests arrive from the public booking page and are polled once a minute</p></div>" + items + "</div>";
+  }
+
+  function financeFilters() {
+    return '<div class="card" style="padding:12px"><div class="row">' +
+      '<input class="input" type="date" value="2026-09-24" style="max-width:170px" aria-label="Date">' +
+      '<select class="input" style="max-width:180px" aria-label="Category"><option>All categories</option>' +
+      (S.ftab === "income"
+        ? "<option>Orthodontics</option><option>Restorative</option><option>Surgery</option>"
+        : "<option>Supplies</option><option>Lab fees</option><option>Rent</option>") + "</select>" +
+      '<select class="input" style="max-width:190px" aria-label="Account"><option>All accounts</option><option>Cashier — Main</option><option>Cashier — Annex</option></select>' +
+      '<select class="input" style="max-width:180px" aria-label="Dentist"' + (S.ftab === "expense" ? " disabled" : "") +
+        '><option>' + (S.ftab === "expense" ? "Not applicable" : "All dentists") + "</option><option>Dr. Ramirez</option></select>" +
+      '<button class="btn btn-ghost sm" data-act="toast" data-msg="Filters AND-combine and re-query the active tab only.">Apply filters</button>' +
+      "</div></div>";
+  }
+
+  function screenFinance() {
+    var isInc = S.ftab === "income";
+    var data = isInc ? INCOME : EXPENSE;
+    var total = sum(data, isInc ? 5 : 4);
+    var rows = data.map(function (r) {
+      return "<tr><td class=\"tnum\">" + esc(r[0]) + "</td><td style=\"font-weight:600;color:var(--app-ink)\">" + esc(r[1]) + "</td>" +
+        "<td>" + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td>" +
+        (isInc ? "<td>" + esc(r[4]) + "</td>" : "") +
+        '<td class="num" style="font-weight:700;color:' + (isInc ? "var(--ok-ink)" : "var(--bad-ink)") + '">' +
+        peso(isInc ? r[5] : r[4]) + "</td></tr>";
+    }).join("");
+
+    var pdf = has("finance_suite")
+      ? '<button class="btn btn-ghost" data-act="toast" data-msg="Demo — the PDF opens in a preview, then saves.">⬇︎ Download PDF</button>'
+      : '<button class="btn btn-ghost" disabled title="Finance Suite — Clinic and Pro">🔒 Download PDF — Clinic</button>';
+
+    return '<div class="stack">' +
+      '<div class="between"><div><h1 class="h1">Finance</h1>' +
+      '<p class="sub">Income and expense ledger · September 2026' + (has("multi_branch") ? " · all branches" : "") + "</p></div>" +
+      '<div class="row">' + pdf +
+      '<button class="btn btn-primary" data-act="toast" data-msg="Demo — the entry form opens here.">+ Add ' + (isInc ? "income" : "expense") + "</button></div></div>" +
+      (has("finance_suite") ? "" :
+        '<div class="lockline"><span style="font-size:17px">🔒</span><span><b>PDF Ledger Export is part of the Finance Suite.</b>' +
+        "The ledger itself stays open on every tier — Solo includes basic income and expense tracking. Upgrade to Clinic to export it.</span></div>") +
+      '<div class="grid g3">' +
+        statCard(isInc ? "Income shown" : "Expense shown", peso(total), data.length + " transactions", isInc ? "💰" : "🧾",
+                 isInc ? "#10b981" : "#f43f5e", isInc ? "#059669" : "#e11d48") +
+        statCard("Cashier — Main", peso(214860, false), "balance on hand", "🏦", "#0ea5e9", "#0284c7") +
+        statCard("Cashier — Annex", peso(38420, false), "balance on hand", "🏦", "#8b5cf6", "#7c3aed") +
+      "</div>" +
+      '<div class="tabs"><button data-act="ftab" data-tab="income" aria-selected="' + isInc + '">Income</button>' +
+      '<button data-act="ftab" data-tab="expense" aria-selected="' + !isInc + '">Expense</button></div>' +
+      financeFilters() +
+      '<div class="card tight"><div class="tablewrap"><table><thead><tr><th>Date</th>' +
+      "<th>" + (isInc ? "Patient" : "Payee") + "</th><th>Category</th><th>Account</th>" +
+      (isInc ? "<th>Dentist</th>" : "") + '<th class="num">Amount</th></tr></thead><tbody>' + rows +
+      "</tbody></table></div></div></div>";
+  }
+
+  function barChart() {
+    var W = 560, H = 210, pad = 34, gap = 14;
+    var max = 360000;
+    var cw = (W - pad - 8) / REVENUE.length;
+    var bars = REVENUE.map(function (r, i) {
+      var x = pad + i * cw;
+      var bw = (cw - gap) / 2;
+      var ih = (r.inc / max) * (H - 46), eh = (r.exp / max) * (H - 46);
+      return '<rect x="' + (x + 2) + '" y="' + (H - 26 - ih) + '" width="' + bw + '" height="' + ih +
+        '" rx="3" fill="#0284c7"></rect>' +
+        '<rect x="' + (x + 4 + bw) + '" y="' + (H - 26 - eh) + '" width="' + bw + '" height="' + eh +
+        '" rx="3" fill="#cbd5e1"></rect>' +
+        '<text x="' + (x + cw / 2 - 4) + '" y="' + (H - 10) + '" font-size="11" fill="#64748b" text-anchor="middle">' + r.m + "</text>";
+    }).join("");
+    var ticks = [0, 120000, 240000, 360000].map(function (v) {
+      var y = H - 26 - (v / max) * (H - 46);
+      return '<line x1="' + pad + '" y1="' + y + '" x2="' + (W - 4) + '" y2="' + y + '" stroke="#e2e8f0" stroke-width="1"></line>' +
+        '<text x="' + (pad - 6) + '" y="' + (y + 3.5) + '" font-size="10" fill="#94a3b8" text-anchor="end">' +
+        (v ? (v / 1000) + "k" : "0") + "</text>";
+    }).join("");
+    return '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" height="210" role="img" ' +
+      'aria-label="Monthly income against expense, April to September 2026">' + ticks + bars + "</svg>";
+  }
+
+  function mixChart() {
+    var total = MIX.reduce(function (t, m) { return t + m[1]; }, 0);
+    return MIX.map(function (m) {
+      var pct = Math.round((m[1] / total) * 100);
+      return '<div style="margin-bottom:11px"><div class="between" style="font-size:12.5px;margin-bottom:4px">' +
+        "<span>" + esc(m[0]) + '</span><span class="tnum muted">' + peso(m[1], false) + " · " + pct + "%</span></div>" +
+        '<div style="height:8px;border-radius:999px;background:#eef2f6;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + m[2] + ';border-radius:999px"></div></div></div>';
+    }).join("");
+  }
+
+  function screenReports() {
+    return '<div class="stack">' +
+      '<div><h1 class="h1">Reports</h1><p class="sub">Six months to September 2026 · Finance Suite</p></div>' +
+      '<div class="grid g4">' +
+        statCard("Income, 6 months", peso(1755200, false), "+12.4% vs previous six", "📈", "#10b981", "#059669") +
+        statCard("Expense, 6 months", peso(1093000, false), "62.3% of income", "📉", "#f59e0b", "#d97706") +
+        statCard("Net", peso(662200, false), "margin 37.7%", "🏦", "#0ea5e9", "#0284c7") +
+        statCard("Avg. per visit", peso(2140, false), "821 visits billed", "🦷", "#8b5cf6", "#7c3aed") +
+      "</div>" +
+      '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">' +
+        '<div class="card" style="grid-column:span 2;min-width:0"><div class="between" style="margin-bottom:8px">' +
+        '<h2 class="h2">Income vs expense</h2><span class="legend"><span><span class="dot" style="background:#0284c7"></span>Income</span>' +
+        '<span><span class="dot" style="background:#cbd5e1"></span>Expense</span></span></div>' + barChart() + "</div>" +
+        '<div class="card"><h2 class="h2" style="margin-bottom:12px">Procedure mix — September</h2>' + mixChart() + "</div>" +
+      "</div></div>";
+  }
+
+  function screenCommission() {
+    var rows = COMMISSION.map(function (c) {
+      return "<tr><td style=\"font-weight:600;color:var(--app-ink)\">" + esc(c[0]) + "</td><td>" + esc(c[1]) + "</td>" +
+        '<td class="num">' + peso(c[2]) + '</td><td class="num faint">' + (c[3] ? "−" + peso(c[3]) : "—") + "</td>" +
+        '<td><span class="badge b-flat">' + esc(c[4]) + "</span></td>" +
+        '<td class="num" style="font-weight:700;color:var(--ok-ink)">' + peso(typeof c[5] === "string" ? Number(c[5]) : c[5]) + "</td></tr>";
+    }).join("");
+    var total = COMMISSION.reduce(function (t, c) { return t + Number(c[5]); }, 0);
+
+    var rates = RATES.map(function (r) {
+      return '<div style="border-bottom:1px solid #f1f5f9;padding:12px 0">' +
+        '<div class="row" style="gap:9px">' + avatar(r.dds, 30) +
+        '<b style="font-size:13.5px">' + esc(r.dds) + "</b>" +
+        '<span class="badge b-flat" style="margin-left:auto">Default ' + esc(r.base) + "</span></div>" +
+        '<div class="row" style="gap:6px;margin-top:8px">' + r.rules.map(function (x) {
+          return '<span class="badge b-tag">' + esc(x[0]) + (x[1] ? " · " + esc(x[1]) : "") + "</span>";
+        }).join("") + "</div>" +
+        (can("admin", "edit") ? '<button class="btn btn-ghost sm" style="margin-top:9px" data-act="toast" data-msg="Demo — per-category rates: a percentage or a fixed peso amount.">Rates…</button>' : "") +
+        "</div>";
+    }).join("");
+
+    return '<div class="stack">' +
+      '<div class="between"><div><h1 class="h1">Dentist commission</h1>' +
+      '<p class="sub">Dr. Joseph Ramirez · 24 September 2026</p></div>' +
+      '<button class="btn btn-ghost" data-act="toast" data-msg="Demo — landscape PDF, previewed before it saves.">⬇︎ Download PDF</button></div>' +
+      '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">' +
+      '<div class="card"><h2 class="h2">Commission rates</h2>' +
+      '<p class="xs muted" style="margin-top:3px">A rate is a setting, not a figure in today\'s report — change one and every day\'s numbers follow.</p>' +
+      rates + "</div>" +
+      '<div class="card tight" style="grid-column:span 2;min-width:0"><div class="tablewrap"><table><thead><tr>' +
+      "<th>Patient</th><th>Category</th><th class=\"num\">Amount</th><th class=\"num\">Deductions</th><th>Rate</th>" +
+      '<th class="num">Commission</th></tr></thead><tbody>' + rows +
+      '<tr><td colspan="5" style="font-weight:700;color:var(--app-ink)">Total payable</td>' +
+      '<td class="num" style="font-weight:800;font-size:15px">' + peso(total) + "</td></tr></tbody></table></div></div>" +
+      "</div></div>";
+  }
+
+  function screenInventory() {
+    var write = can("inventory", "edit");
+    var rows = STOCK.map(function (s) {
+      var low = s[2] <= s[4];
+      return '<tr><td><b style="color:var(--app-ink)">' + esc(s[0]) + '</b><p class="xs faint">' + esc(s[1]) + "</p></td>" +
+        (has("multi_branch") ? "<td>" + esc(s[8]) + "</td>" : "") +
+        '<td class="num tnum" style="font-weight:700">' + s[2] + ' <span class="faint" style="font-weight:400">' + esc(s[3]) + "</span></td>" +
+        '<td class="num tnum faint">' + s[4] + " / " + s[5] + "</td>" +
+        "<td>" + esc(s[6]) + "</td><td>" + esc(s[7]) + "</td>" +
+        '<td><span class="badge ' + (low ? "b-cancelled" : "b-completed") + '">' + (low ? "reorder" : "ok") + "</span></td>" +
+        (write ? '<td class="num"><button class="btn btn-ghost sm" data-act="toast" data-msg="Demo — stock adjustment.">Edit</button></td>' : "") +
+        "</tr>";
+    }).join("");
+
+    var strip = has("multi_branch")
+      ? '<div class="grid g3">' + BRANCHES.map(function (b) {
+          return '<button class="card" style="text-align:left;cursor:pointer" data-act="toast" data-msg="Clicking a branch card is the branch filter.">' +
+            '<p class="lab">' + esc(b.name.replace("Softeeth Dental Care — ", "")) + "</p>" +
+            '<p class="tnum" style="font-size:20px;font-weight:700">' + b.stock + " lines</p>" +
+            '<p class="xs faint">' + esc(b.city) + "</p></button>";
+        }).join("") + "</div>"
+      : "";
+
+    return '<div class="stack">' +
+      '<div class="between"><div><h1 class="h1">Inventory</h1>' +
+      '<p class="sub">2 items below reorder level' + (write ? "" : " · the stock room belongs to the front desk — view only for you") + "</p></div>" +
+      (write ? '<button class="btn btn-primary" data-act="toast" data-msg="Demo — add item.">+ Add item</button>' : '<span class="badge b-flat">View only</span>') +
+      "</div>" + strip +
+      '<div class="card tight"><div class="tablewrap"><table><thead><tr><th>Item</th>' +
+      (has("multi_branch") ? "<th>Branch</th>" : "") +
+      "<th class=\"num\">Stock</th><th class=\"num\">Reorder / target</th><th>Expiry</th><th>Supplier</th><th>Status</th>" +
+      (write ? "<th></th>" : "") + "</tr></thead><tbody>" + rows + "</tbody></table></div></div></div>";
+  }
+
+  function screenDirectory() {
+    var rows = DIRECTORY.map(function (d) {
+      return '<div class="card" style="padding:15px"><div class="row" style="gap:11px">' + avatar(d[0], 38) +
+        '<div style="min-width:0;flex:1"><b style="font-size:14px">' + esc(d[0]) + "</b>" +
+        '<p class="xs muted">' + esc(d[1]) + " · " + esc(d[3]) + "</p></div>" +
+        '<span class="tnum xs" style="font-weight:600">' + esc(d[2]) + "</span></div>" +
+        '<p class="xs faint" style="margin-top:8px">' + esc(d[4]) + "</p></div>";
+    }).join("");
+    return '<div class="stack"><div class="between"><div><h1 class="h1">Directory</h1>' +
+      '<p class="sub">Labs, suppliers and referral contacts — shared by the whole practice</p></div>' +
+      '<button class="btn btn-primary" data-act="toast" data-msg="Demo — add contact.">+ Add contact</button></div>' +
+      '<div class="grid g2">' + rows + "</div></div>";
+  }
+
+  function meter(label, used, cap) {
+    var unl = cap === null;
+    var pct = unl ? 12 : Math.min(100, Math.round((used / cap) * 100));
+    var over = !unl && used > cap;
+    var col = over ? "#e11d48" : pct >= 80 ? "#d97706" : "#0284c7";
+    return '<div style="margin-bottom:13px"><div class="between" style="font-size:12.5px;margin-bottom:4px">' +
+      "<span>" + esc(label) + '</span><span class="tnum ' + (over ? "" : "muted") + '" style="' + (over ? "color:#9f1239;font-weight:700" : "") + '">' +
+      used.toLocaleString("en-PH") + " / " + (unl ? "∞" : cap.toLocaleString("en-PH")) + "</span></div>" +
+      '<div style="height:8px;border-radius:999px;background:#eef2f6;overflow:hidden">' +
+      '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:999px"></div></div></div>';
+  }
+
+  var ATABS = [["staff","Staff"],["plan","Subscription"],["branches","Branches"],["slots","Daily slot limits"]];
+
+  function screenAdmin() {
+    var tabs = '<div class="tabs">' + ATABS.map(function (t) {
+      return '<button data-act="atab" data-tab="' + t[0] + '" aria-selected="' + (S.atab === t[0]) + '">' + t[1] + "</button>";
+    }).join("") + "</div>";
+
+    var body;
+    if (S.atab === "staff") {
+      var people = [
+        ["Dr. Maria Santillan","owner","Owner · administrator","Main","Active", PLANS[S.plan].name],
+        ["Dr. Joseph Ramirez","dentist","Dentist","Main","Active","—"],
+        ["Aileen Cruz","staff","Front desk","Main","Active","—"],
+        ["Dr. Karla Uy","dentist","Dentist","Annex","Active","—"],
+        ["Jomar Peña","staff","Cashier","Annex","Active","—"],
+        ["Rhea Sandoval","staff","Dental assistant","Main","Inactive","—"]
+      ].map(function (u) {
+        return '<tr class="click" data-act="toast" data-msg="Demo — the staff record opens here."><td>' +
+          '<span class="row" style="gap:10px;flex-wrap:nowrap">' + avatar(u[0]) +
+          '<span><span style="display:block;font-weight:700;color:var(--app-ink)">' + esc(u[0]) + "</span>" +
+          '<span class="xs faint">' + esc(u[2]) + "</span></span></span></td>" +
+          '<td><span class="badge ' + (u[1] === "owner" ? "b-tag" : u[1] === "dentist" ? "b-scheduled" : "b-flat") + '">' + esc(u[1]) + "</span></td>" +
+          "<td>" + esc(u[3]) + "</td>" +
+          '<td><span class="badge ' + (u[4] === "Active" ? "b-completed" : "b-deferred") + '">' + esc(u[4]) + "</span></td>" +
+          "<td>" + esc(u[5]) + "</td></tr>";
+      }).join("");
+      body = '<div class="card tight"><div class="tablewrap"><table><thead><tr><th>Name</th><th>Role</th>' +
+        "<th>Location</th><th>Status</th><th>Plan</th></tr></thead><tbody>" + people + "</tbody></table></div></div>" +
+        '<p class="xs muted">A deactivated account frees its plan seat while keeping everything that person recorded. ' +
+        "The owner fills a <b>staff</b> seat, never a dentist one — an owner is an administrator, read-only on the chart.</p>";
+    } else if (S.atab === "plan") {
+      var q = PLANS[S.plan].quota;
+      var over = (q.patients !== null && USAGE.patients > q.patients) ||
+                 (q.staff !== null && USAGE.staff > q.staff) ||
+                 (q.locations !== null && USAGE.locations > q.locations);
+      body = '<div class="grid g2">' +
+        '<div class="card"><div class="between"><h2 class="h2">Subscription</h2>' +
+        '<span class="badge b-tag">' + PLANS[S.plan].name + " · ₱" + PLANS[S.plan].price + "/mo</span></div>" +
+        '<p class="xs muted" style="margin:6px 0 14px">Billed to Dr. Maria Santillan, who is the subscriber. ' +
+        "Everyone she hires is metered against this one plan.</p>" +
+        meter("Dentist seats", USAGE.dentists, q.dentists) +
+        meter("Staff seats", USAGE.staff, q.staff) +
+        meter("Patient records", USAGE.patients, q.patients) +
+        meter("Patient photos", USAGE.photos, q.photos) +
+        meter("Locations", USAGE.locations, q.locations) +
+        (over ? '<div class="lockline" style="margin-top:6px"><span style="font-size:17px">⚠️</span><span>' +
+          "<b>Over this tier's ceiling.</b>Everything already recorded stays readable and editable — only <i>new</i> rows are refused, " +
+          "with a 402 that names the quota. Nothing is ever locked away.</span></div>" : "") +
+        "</div>" +
+        '<div class="card"><h2 class="h2">Modules on this plan</h2><div class="stack" style="gap:7px;margin-top:11px">' +
+        [["Patients, charting, notes", true],["Appointments & online booking", true],
+         ["Basic income / expense", true],["Finance Suite & PDF export", has("finance_suite")],
+         ["Dentist commission reports", has("commission_reports")],["Inventory", has("inventory")],
+         ["Multi-branch (up to 3 locations)", has("multi_branch")],["Custom branding & white-label", has("custom_branding")],
+         ["Daily slot limits", has("daily_slot_limits")],["Freehand chart annotation", has("chart_annotation")]
+        ].map(function (m) {
+          return '<div class="between" style="font-size:13px;border-bottom:1px solid #f1f5f9;padding-bottom:6px">' +
+            "<span>" + esc(m[0]) + "</span>" +
+            (m[1] ? '<span class="badge b-completed">included</span>' : '<span class="badge b-flat">🔒 upgrade</span>') + "</div>";
+        }).join("") + "</div></div></div>";
+    } else if (S.atab === "branches") {
+      if (!has("multi_branch")) {
+        body = '<div class="lockline"><span style="font-size:17px">🔒</span><span><b>Multi-branch is a Pro feature.</b>' +
+          "The panel stays here on every tier so you can see what it does rather than wonder whether it exists. " +
+          "Pro covers three locations — head office plus two branches.</span></div>";
+      } else {
+        body = '<div class="stack">' + BRANCHES.map(function (b) {
+          return '<div class="card"><div class="between"><div><b style="font-size:15px">' + esc(b.name) + "</b>" +
+            '<p class="xs muted">' + esc(b.city) + (b.main ? " · main clinic" : "") + "</p></div>" +
+            '<div class="row" style="gap:16px"><span><span class="lab">Staff</span><b class="tnum" style="display:block">' + b.staff + "</b></span>" +
+            '<span><span class="lab">Patients</span><b class="tnum" style="display:block">' + b.patients.toLocaleString("en-PH") + "</b></span>" +
+            '<span><span class="lab">Stock lines</span><b class="tnum" style="display:block">' + b.stock + "</b></span></div></div></div>";
+        }).join("") +
+        '<div class="card" style="border-style:dashed;text-align:center">' +
+        '<b style="font-size:14px">One location left on Pro</b>' +
+        '<p class="xs muted" style="margin-top:4px">A branch is a clinic with a parent — its own patients, staff, diary, stock and till, ' +
+        "under one subscription. Staff see only their own location; the owner sees them all.</p>" +
+        '<button class="btn btn-primary sm" style="margin-top:10px" data-act="toast" data-msg="Demo — opening a branch provisions its accounts, visit reasons and till.">+ Open a branch</button></div></div>';
+      }
+    } else {
+      var srows = VISIT_REASONS.map(function (v) {
+        var full = v.cap !== null && v.booked >= v.cap;
+        return "<tr><td style=\"font-weight:600;color:var(--app-ink)\">" + esc(v.name) + "</td>" +
+          '<td class="num tnum">' + (v.cap === null ? '<span class="faint">unlimited</span>' : v.cap) + "</td>" +
+          '<td class="num tnum">' + v.booked + "</td>" +
+          '<td><span class="badge ' + (full ? "b-cancelled" : "b-completed") + '">' + (full ? "full today" : "open") + "</span></td></tr>";
+      }).join("");
+      body = (has("daily_slot_limits") ? "" :
+        '<div class="lockline" style="margin-bottom:14px"><span style="font-size:17px">🔒</span><span>' +
+        "<b>Editing the caps is a Pro feature, and below Pro they are not enforced.</b>" +
+        "Your stored numbers are kept untouched and come back the day you upgrade. The reasons themselves stay live on every tier — " +
+        "gating them would leave your booking page with nothing to book.</span></div>") +
+        '<div class="card tight"><div class="tablewrap"><table><thead><tr><th>Visit reason</th>' +
+        "<th class=\"num\">Every day</th><th class=\"num\">Booked, 24 Sep</th><th>Today</th></tr></thead><tbody>" +
+        srows + "</tbody></table></div></div>" +
+        '<p class="xs muted">A cap of <b>0</b> means "not offered", which is different from no cap at all. ' +
+        "Public bookings are refused when a reason is full; a staff booking is warned but never blocked — the calendar keeps clinical judgement for emergencies.</p>";
+    }
+
+    return '<div class="stack"><div><h1 class="h1">Admin</h1>' +
+      '<p class="sub">Staff, subscription, locations and the booking rules</p></div>' + tabs + body + "</div>";
+  }
+
+  function deniedScreen() {
+    return '<div class="card" style="max-width:520px;margin:40px auto;text-align:center">' +
+      '<p style="font-size:30px">🔒</p><h2 class="h2" style="margin-top:8px">Not on your sheet</h2>' +
+      '<p class="sub">Your role does not include this module, so the route is closed and the nav item is not rendered. ' +
+      "Switch the role above to see the same app from another desk.</p></div>";
+  }
+
+  function renderApp() {
+    var items = navItems();
+    var ok = items.some(function (n) { return n.id === S.screen; }) || S.screen === "patient";
+    var content = !ok ? deniedScreen()
+      : S.screen === "dashboard" ? screenDashboard()
+      : S.screen === "patients" ? screenPatients()
+      : S.screen === "patient" ? screenPatient()
+      : S.screen === "appointments" ? screenAppointments()
+      : S.screen === "requests" ? screenRequests()
+      : S.screen === "finance" ? screenFinance()
+      : S.screen === "reports" ? screenReports()
+      : S.screen === "commission" ? screenCommission()
+      : S.screen === "inventory" ? screenInventory()
+      : S.screen === "directory" ? screenDirectory()
+      : screenAdmin();
+
+    var nav = items.map(function (n) {
+      var cur = S.screen === n.id || (n.id === "patients" && S.screen === "patient");
+      return '<button data-act="go" data-screen="' + n.id + '"' + (cur ? ' aria-current="page"' : "") + ">" +
+        '<span class="ico">' + n.icon + "</span><span style=\"flex:1\">" + n.label + "</span>" +
+        (n.badge && pending() ? '<span class="cnt">' + pending() + "</span>" : "") + "</button>";
+    }).join("");
+
+    return '<div class="stage' + (S.navOpen ? " nav-open" : "") + '">' +
+      '<aside class="rail"><div class="rail-brand"><span class="chip"><img src="softeeth-mark.png" alt=""></span>' +
+        "<span><b>Softeeth Dental</b><span>Cebu City</span></span></div>" +
+        "<nav>" + nav + "</nav>" +
+        '<div class="rail-foot"><p class="k">Signed in as</p><p class="n">' + esc(me().name) + "</p>" +
+        '<p class="r">' + esc(me().role) + "</p></div></aside>" +
+      '<div class="panel"><div class="apphead">' +
+        '<button class="burger" data-act="nav" aria-label="Menu">☰</button>' +
+        '<span class="sys">Dental Clinic Management System</span>' +
+        '<span class="who">' + avatar(me().name, 32) +
+        '<span style="font-size:13px;font-weight:700">' + esc(me().name) + "</span>" +
+        '<button class="btn btn-ghost sm">Sign out</button></span></div>' +
+        '<div class="scroll" id="scroll">' + content + "</div></div></div>";
+  }
+
+  /* ---------------- public booking ---------------- */
+
+  function renderBooking() {
+    var cap = VISIT_REASONS.map(function (v) {
+      var left = v.cap === null ? null : v.cap - v.booked;
+      var full = left !== null && left <= 0;
+      var on = S.book.reasons.indexOf(v.name) >= 0;
+      return '<button class="chipbtn" data-act="reason" data-name="' + esc(v.name) + '" aria-pressed="' + on + '"' +
+        (full ? " disabled" : "") + ">" + esc(v.name) +
+        (v.cap === null ? "" : '<span class="slots">' + (full ? "full" : left + " left") + "</span>") + "</button>";
+    }).join("");
+
+    var days = "";
+    var first = new Date(2026, 8, 1).getDay();
+    for (var i = 0; i < first; i++) days += "<span></span>";
+    for (var d = 1; d <= 30; d++) {
+      var past = d < 25;
+      var sun = new Date(2026, 8, d).getDay() === 0;
+      var on = S.book.date === d;
+      days += '<button class="bookday" data-act="bookday" data-d="' + d + '"' + (past || sun ? " disabled" : "") +
+        ' aria-pressed="' + on + '" style="border:1px solid ' + (on ? "#0284c7" : "var(--app-line)") +
+        ';background:' + (on ? "#0284c7" : past || sun ? "#f8fafc" : "#fff") + ";color:" +
+        (on ? "#fff" : past || sun ? "#cbd5e1" : "var(--app-ink-2)") +
+        ';border-radius:9px;padding:7px 0;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums">' + d + "</button>";
+    }
+
+    var chosen = S.book.reasons.length
+      ? S.book.reasons.join(", ")
+      : "— pick at least one above";
+
+    return '<div class="sheet">' +
+      '<div class="between" style="margin-bottom:6px"><div>' +
+      '<h2 style="font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.02em">Book with Softeeth Dental</h2>' +
+      '<p style="font-size:13.5px;color:var(--page-muted);margin-top:4px">' +
+      "This is the page your patients see at <b>/book</b> — no login, on your own clinic's link. " +
+      "Every request lands in the Requests screen on the staff side.</p></div>" +
+      '<span class="badge b-completed">Mon–Sat · 9:00 AM – 6:00 PM</span></div>' +
+
+      '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:20px">' +
+
+        '<div class="stack" style="gap:16px">' +
+          '<div><p class="lab" style="color:var(--page-muted)">Are you a…</p>' +
+          '<div class="row" style="gap:8px;margin-top:6px">' +
+          ["new","returning"].map(function (t) {
+            return '<button class="chipbtn" data-act="ptype" data-t="' + t + '" aria-pressed="' + (S.book.type === t) + '">' +
+              (t === "new" ? "New patient" : "Returning patient") + "</button>";
+          }).join("") + "</div></div>" +
+
+          '<div><p class="lab" style="color:var(--page-muted)">What brings you in? <span style="text-transform:none;letter-spacing:0">(choose any)</span></p>' +
+          '<div class="row" style="gap:7px;margin-top:8px">' + cap + "</div>" +
+          '<p class="xs" style="color:var(--page-muted);margin-top:9px">Counts are live. A reason that has filled its daily slots ' +
+          "is greyed out here and refused by the server — the front desk can still override it on the calendar for an emergency.</p></div>" +
+
+          '<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">' +
+          '<label><p class="lab" style="color:var(--page-muted)">Full name</p><input class="input" value="Cherry Mae Ong"></label>' +
+          '<label><p class="lab" style="color:var(--page-muted)">Mobile number</p><input class="input" value="0921 776 5530"></label>' +
+          "</div>" +
+          '<p class="xs" style="color:var(--page-muted);margin-top:-8px">The number is checked for digits, not just for text — ' +
+          "a surname typed into this box used to become someone's phone number on their new chart.</p>" +
+        "</div>" +
+
+        '<div class="stack" style="gap:16px">' +
+          '<div><p class="lab" style="color:var(--page-muted)">Preferred date · September 2026</p>' +
+          '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px">' + days + "</div></div>" +
+          '<div><p class="lab" style="color:var(--page-muted)">Preferred time</p>' +
+          '<div class="row" style="gap:7px;margin-top:6px">' +
+          ["9:00 AM","10:30 AM","1:00 PM","2:30 PM","4:00 PM"].map(function (t, i) {
+            return '<button class="chipbtn" aria-pressed="' + (i === 2) + '" data-act="toast" data-msg="Demo — preferred time noted on the request.">' + t + "</button>";
+          }).join("") + "</div></div>" +
+          '<div style="background:var(--page-chip);border:1px solid var(--page-line);border-radius:12px;padding:14px">' +
+          '<p class="lab" style="color:var(--page-muted)">Your request</p>' +
+          '<p style="font-size:13px;margin-top:5px"><b>' + (S.book.type === "new" ? "New patient" : "Returning patient") +
+          "</b> · " + esc(chosen) + "</p>" +
+          '<p style="font-size:13px;color:var(--page-muted)">' + esc("Thu 24".replace("24", String(S.book.date))) +
+          " September 2026, around 1:00 PM</p>" +
+          '<button class="btn btn-primary" style="margin-top:12px;width:100%" data-act="submitBooking">Request this appointment</button>' +
+          '<p class="xs" style="color:var(--page-muted);margin-top:8px">Nothing is confirmed until the clinic approves it. ' +
+          "Approving is also what opens the patient's chart.</p></div>" +
+        "</div>" +
+      "</div></div>";
+  }
+
+  /* ---------------- pricing ---------------- */
+
+  function renderPlans() {
+    var cards = ["solo","clinic","pro"].map(function (k) {
+      var p = PLANS[k];
+      var cur = S.plan === k;
+      return '<div class="tier' + (p.popular ? " pop" : "") + (p.accent ? " acc" : "") + '">' +
+        (p.popular ? '<span class="flag">Most popular</span>' : "") +
+        "<h3>" + p.name + "</h3>" +
+        '<p style="font-size:13px;color:var(--page-muted);min-height:38px">' + esc(p.tagline) + "</p>" +
+        '<div class="row" style="gap:8px;align-items:baseline"><span style="font-size:17px;font-weight:700;color:var(--page-muted)">₱</span>' +
+        '<span class="amt">' + p.price + '</span><span class="strike">₱' + p.regular + "</span>" +
+        '<span style="font-size:13px;color:var(--page-muted);font-weight:600">/month</span></div>' +
+        '<p class="xs" style="color:var(--page-muted);margin-top:-6px">Founding rate — regular price after launch.</p>' +
+        "<ul>" + p.list.map(function (f) {
+          if (f.indexOf("LEAD:") === 0) return '<li class="lead">' + esc(f.slice(5)) + "</li>";
+          return '<li><span class="tick">✓</span><span>' + esc(f) + "</span></li>";
+        }).join("") + "</ul>" +
+        '<button class="btn ' + (cur ? "btn-ghost" : "btn-primary") + '" style="margin-top:auto" data-act="setplan" data-plan="' + k + '"' +
+        (cur ? " disabled" : "") + ">" + (cur ? "Currently previewing" : "Preview the app on " + p.name) + "</button>" +
+        "</div>";
+    }).join("");
+
+    return '<div class="stack" style="gap:20px">' +
+      '<div class="sheet" style="text-align:center">' +
+      '<h2 style="font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-.025em">Priced on the size of the practice, not per seat you dare not fill</h2>' +
+      '<p style="font-size:14px;color:var(--page-muted);margin:8px auto 0;max-width:62ch">' +
+      "Clinical care is in every tier — charting, notes, ortho, lab cases, online booking. What gates is practice management: " +
+      "the finance suite and commissions at Clinic, multi-branch and white-label at Pro. Pick one below and the demo re-renders on it.</p></div>" +
+      '<div class="price">' + cards + "</div>" +
+      '<div class="sheet"><div class="grid g3">' +
+      [["Runs on your own link","Your clinic name, your logo, your booking URL. Patients never see ours."],
+       ["Your data stays yours","Export the ledger, the commission sheet and every document to PDF whenever you like."],
+       ["Set up in an afternoon","We migrate your patient list, seed your visit reasons and train the front desk."]
+      ].map(function (x) {
+        return '<div><b style="font-family:var(--display);font-size:15px">' + esc(x[0]) + "</b>" +
+          '<p style="font-size:13px;color:var(--page-muted);margin-top:5px">' + esc(x[1]) + "</p></div>";
+      }).join("") + "</div></div></div>";
+  }
+
+  /* =======================================================================
+     TOUR
+     ======================================================================= */
+
+  var TOUR = [
+    { seg:"app", screen:"dashboard", role:"owner", plan:"pro",
+      t:"The morning, on one screen",
+      b:"Today's chairs, the money that has come in, what is running low, and the booking requests nobody has answered yet." },
+    { seg:"app", screen:"patient", role:"dentist", plan:"pro", patient:1, ptab:"chart",
+      t:"The chart is the record",
+      b:"Pick a condition from the palette and click a tooth — 52 of them, permanent and primary, FDI numbered. Notes, ortho and forms sit on the tabs beside it." },
+    { seg:"book", role:"owner", plan:"pro",
+      t:"Patients book themselves",
+      b:"Your own booking link, with live daily slot counts. A reason that has filled up is refused here and nowhere else — the front desk can still fit in an emergency." },
+    { seg:"app", screen:"requests", role:"staff", plan:"pro",
+      t:"Approving is what opens the chart",
+      b:"One click accepts the visit and either links the returning patient or opens a new record from what they typed. Front desk can act; try switching to Owner and watch the buttons go." },
+    { seg:"app", screen:"finance", role:"owner", plan:"solo",
+      t:"Pay for the size you are",
+      b:"This is the same app on Solo. The ledger stays — basic income and expense is in every tier — but PDF export, reports, commissions and inventory have stepped back behind the Clinic tier." },
+    { seg:"plans", role:"owner", plan:"pro",
+      t:"Three tiers, enforced not advertised",
+      b:"Every ceiling on this page is a number the server actually applies. Pick a tier and the whole demo re-renders on it." }
+  ];
+
+  function applyTour(i) {
+    var s = TOUR[i];
+    S.seg = s.seg; S.role = s.role; S.plan = s.plan;
+    if (s.screen) S.screen = s.screen;
+    if (s.patient) { S.patient = s.patient; }
+    if (s.ptab) S.ptab = s.ptab;
+    S.tour = i;
+    document.getElementById("roleSel").value = S.role;
+    document.getElementById("planSel").value = S.plan;
+    render();
+  }
+
+  function tourCard() {
+    var el = document.getElementById("tourcard");
+    if (S.tour < 0) { if (el) el.remove(); return; }
+    var s = TOUR[S.tour];
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "tourcard";
+      el.className = "tour";
+      document.body.appendChild(el);
+    }
+    el.innerHTML = '<span class="step">' + (S.tour + 1) + "/" + TOUR.length + "</span>" +
+      "<div style=\"flex:1;min-width:0\"><h4>" + esc(s.t) + "</h4><p>" + esc(s.b) + "</p>" +
+      '<div class="acts">' +
+      (S.tour > 0 ? '<button data-act="tourprev">Back</button>' : "") +
+      (S.tour < TOUR.length - 1
+        ? '<button class="go" data-act="tournext">Next</button>'
+        : '<button class="go" data-act="tourend">Explore on my own</button>') +
+      '<button data-act="tourend">Close</button></div></div>';
+  }
+
+  /* =======================================================================
+     RENDER + EVENTS
+     ======================================================================= */
+
+  var root = document.getElementById("root");
+
+  function render() {
+    document.querySelectorAll("#seg button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.seg === S.seg));
+    });
+    root.innerHTML = S.seg === "app" ? renderApp() : S.seg === "book" ? renderBooking() : renderPlans();
+    tourCard();
+  }
+
+  function toast(msg) {
+    var box = document.getElementById("toasts");
+    var t = document.createElement("div");
+    t.className = "toast";
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(function () { t.remove(); }, 2600);
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act], #seg button");
+    if (!b) return;
+
+    if (b.dataset.seg) { S.seg = b.dataset.seg; S.navOpen = false; render(); return; }
+    var a = b.dataset.act;
+
+    if (a === "go") { S.screen = b.dataset.screen; S.navOpen = false; render(); document.getElementById("scroll") && (document.getElementById("scroll").scrollTop = 0); }
+    else if (a === "nav") { S.navOpen = !S.navOpen; render(); }
+    else if (a === "patient") { S.patient = Number(b.dataset.id); S.screen = "patient"; S.ptab = "overview"; render(); }
+    else if (a === "back") { S.screen = "patients"; render(); }
+    else if (a === "ptab") { S.ptab = b.dataset.tab; render(); }
+    else if (a === "ftab") { S.ftab = b.dataset.tab; render(); }
+    else if (a === "atab") { S.atab = b.dataset.tab; render(); }
+    else if (a === "tool") { S.tool = S.tool === b.dataset.tool ? null : b.dataset.tool; render(); }
+    else if (a === "tooth") {
+      var no = b.dataset.no;
+      if (!can("clinical", "edit")) { toast("Read-only for " + (S.role === "owner" ? "the owner" : "the front desk") + " — switch to Dr. Ramirez."); return; }
+      if (!S.tool) { toast("Pick a condition from the palette first."); return; }
+      if (S.tool === "clear") { delete S.chart[no]; toast("Tooth " + no + " cleared."); }
+      else { S.chart[no] = S.tool; toast("Tooth " + no + " — " + CONDITIONS[S.tool].label + " recorded."); }
+      render();
+    }
+    else if (a === "approve") {
+      var r = S.requests.filter(function (x) { return x.id === Number(b.dataset.id); })[0];
+      if (!r) return;
+      r.status = "approved";
+      var known = allPatients().some(function (p) { return (p.last + ", " + p.first).toLowerCase().indexOf(r.name.split(",")[0].toLowerCase()) === 0; });
+      if (!known) {
+        var parts = r.name.split(",");
+        S.extraPatients.unshift({
+          id: 900 + r.id, last: parts[0].trim(), first: (parts[1] || "").trim(), sex: "", age: 0,
+          phone: r.phone, addr: "", tags: [], last_visit: "—", balance: 0, dentist: "Unassigned",
+          since: "Sep 2026", incomplete: true
+        });
+        toast("Approved — a new chart was opened for " + r.name + ".");
+      } else {
+        toast("Approved — linked to the existing chart for " + r.name + ".");
+      }
+      render();
+    }
+    else if (a === "decline") {
+      var d = S.requests.filter(function (x) { return x.id === Number(b.dataset.id); })[0];
+      if (d) { d.status = "declined"; toast("Request declined. The slot is released."); render(); }
+    }
+    else if (a === "reason") {
+      var n = b.dataset.name, i = S.book.reasons.indexOf(n);
+      if (i >= 0) S.book.reasons.splice(i, 1); else S.book.reasons.push(n);
+      render();
+    }
+    else if (a === "ptype") { S.book.type = b.dataset.t; render(); }
+    else if (a === "bookday") { S.book.date = Number(b.dataset.d); render(); }
+    else if (a === "submitBooking") {
+      if (!S.book.reasons.length) { toast("Pick at least one reason for the visit."); return; }
+      toast("Request sent — it is now waiting in the clinic's Requests screen.");
+      S.seg = "app"; S.screen = "requests"; S.role = "staff";
+      document.getElementById("roleSel").value = "staff";
+      render();
+    }
+    else if (a === "setplan") {
+      S.plan = b.dataset.plan;
+      document.getElementById("planSel").value = S.plan;
+      S.seg = "app"; S.screen = "dashboard";
+      toast("Now previewing the " + PLANS[S.plan].name + " tier.");
+      render();
+    }
+    else if (a === "toast") { toast(b.dataset.msg || "Demo."); }
+    else if (a === "tournext") { applyTour(S.tour + 1); }
+    else if (a === "tourprev") { applyTour(S.tour - 1); }
+    else if (a === "tourend") { S.tour = -1; tourCard(); }
+  });
+
+  document.getElementById("roleSel").addEventListener("change", function (e) {
+    S.role = e.target.value;
+    if (S.screen === "patient" && !can("patient", "view")) S.screen = "dashboard";
+    render();
+    toast("Signed in as " + STAFF[S.role].name + ".");
+  });
+  document.getElementById("planSel").addEventListener("change", function (e) {
+    S.plan = e.target.value;
+    render();
+    toast("Previewing the " + PLANS[S.plan].name + " tier.");
+  });
+  document.getElementById("tourBtn").addEventListener("click", function () { applyTour(0); });
+
+  render();
+})();
+</script>
+
+</body></html>

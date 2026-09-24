@@ -92,7 +92,7 @@
     display:inline-flex; align-items:center; justify-content:center; background:#fff;
     border-radius:.6rem; padding:.35rem; box-shadow:var(--shadow-sm);
   }
-  .brand-chip svg{height:2rem; width:2rem}
+  .brand-chip svg,.brand-chip img{height:2rem; width:2rem; object-fit:contain; display:block}
   .brand-name{font-weight:700; font-size:1.125rem; color:var(--s-900); letter-spacing:-.02em; line-height:1}
   .brand-tagline{
     display:block; font-size:9px; font-weight:600; text-transform:uppercase;
@@ -274,16 +274,14 @@
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="softeeth home">
         <span class="brand-chip">
-          <!-- Inline tooth mark (embedded SVG — always renders) -->
-          <svg viewBox="0 0 24 24" role="img" aria-label="softeeth mark">
-            <path fill="#7c3aed" d="M12 3c-3 0-4.5 1.5-6 1.5S3 3.8 3 6c0 3 1 4 1.5 7S5 20 7 20s1-3 2.5-3 1.5 3 2.5 3 1-2 2-2 1 2 2 2 2-4 2.5-7S21 9 21 6c0-2.2-1.5-1.5-3-1.5S15 3 12 3Z"/>
-          </svg>
+          <img src="softeeth-mark.png" alt="softeeth mark" width="32" height="32">
         </span>
         <span class="brand-name">softeeth</span>
       </a>
       <nav class="nav-links">
         <a href="#features">Features</a>
         <a href="#workflow">How it works</a>
+        <a href="walkthrough.html">Walkthrough</a>
         <a href="#pricing">Pricing</a>
         <a href="#login">Book a visit</a>
       </nav>
@@ -553,7 +551,7 @@
     <div class="wrap footer-inner">
       <a class="brand" href="#top" aria-label="softeeth home">
         <span class="brand-chip">
-          <svg viewBox="0 0 24 24" role="img" aria-label="softeeth mark"><path fill="#7c3aed" d="M12 3c-3 0-4.5 1.5-6 1.5S3 3.8 3 6c0 3 1 4 1.5 7S5 20 7 20s1-3 2.5-3 1.5 3 2.5 3 1-2 2-2 1 2 2 2 2-4 2.5-7S21 9 21 6c0-2.2-1.5-1.5-3-1.5S15 3 12 3Z"/></svg>
+          <img src="softeeth-mark.png" alt="softeeth mark" width="32" height="32">
         </span>
         <span>
           <span class="brand-name">softeeth</span>
@@ -563,6 +561,7 @@
       <nav class="footer-nav">
         <a href="#features">Features</a>
         <a href="#workflow">How it works</a>
+        <a href="walkthrough.html">Walkthrough</a>
         <a href="#pricing">Pricing</a>
         <a href="#login">Book a visit</a>
         <a href="#login">Sign in</a>
